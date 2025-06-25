@@ -58,7 +58,7 @@ plugins:
 author:
   name   : "Carla Kirk-Cohen"
   avatar : "/assets/images/bio-photo.jpg"
-  bio    : "My awesome biography constrained to a sentence or two goes here."
+  bio    : "Working on Lightning Stuff"
   links:
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"

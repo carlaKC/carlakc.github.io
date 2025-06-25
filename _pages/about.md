@@ -12,6 +12,7 @@ I work on [Lightning Network Protocol](https://github.com/lightning/bolts) devel
 Currently:
 - dev @ [Chaincode](https://chaincode.com)
 - board @ [Btrust](https://www.btrust.tech)
+- organizer @ [BitDevs NYC](https://bitdevs.org)
 
 Previously:
 - cofounder @ [Qala Africa](https://parah.substack.com/p/the-qala-chronicles-how-africa-found?utm_campaign=post&utm_medium=web)
