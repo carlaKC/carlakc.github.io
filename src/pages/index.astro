@@ -1,9 +1,98 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import { mergeWritingEntries } from '../lib/writing.js';
+import writingLinks from '../data/writing-links.json';
+import workingOn from '../data/working-on.json';
+import appearances from '../data/appearances.json';
+
+const posts = await getCollection('writing', ({ data }) => !data.draft);
+const writing = mergeWritingEntries(posts, writingLinks);
+
+const talks = [...appearances].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+const fmt = (d) => (d instanceof Date ? d : new Date(d)).toISOString().slice(0, 7);
+const sourceLabel = { post: 'post', delving: 'delving ↗', external: 'external ↗' };
 ---
 <Base>
-  <section id="about"><h2>about</h2><p class="muted">placeholder</p></section>
-  <section id="working-on"><h2>working on</h2><p class="muted">placeholder</p></section>
-  <section id="writing"><h2>writing</h2><p class="muted">placeholder</p></section>
-  <section id="appearances"><h2>appearances</h2><p class="muted">placeholder</p></section>
+  <section id="intro" class="intro">
+    <p class="prompt mono muted">carla@web:~$</p>
+    <h1>Carla Kirk-Cohen</h1>
+    <p class="tagline muted">Bitcoin &amp; Lightning Network protocol developer.</p>
+  </section>
+
+  <section id="about">
+    <h2># about</h2>
+    <p>Hi, I'm Carla!</p>
+    <p>I care about working on technology that improves the world around me. I currently work on Bitcoin because I believe that money that can't be censored or corrupted is an important principle. Through this work, I've been fortunate to spend most of my career in open source software development. I value being surrounded by people who care deeply about what they do and choose to do the right thing rather than the easy thing.</p>
+  </section>
+
+  <section id="working-on">
+    <h2># working on</h2>
+    <ul class="cards">
+      {workingOn.map((item) => (
+        <li>
+          <h3>
+            {item.url ? <a href={item.url}>{item.title}</a> : item.title}
+          </h3>
+          <p class="muted">{item.blurb}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section id="writing">
+    <h2># writing</h2>
+    <ul class="rows">
+      {writing.map((entry) => (
+        <li class="row">
+          <a href={entry.href} {...(entry.external ? { target: '_blank', rel: 'noopener' } : {})}>
+            {entry.title}
+          </a>
+          <span class="meta mono muted">
+            <span class="date">{fmt(entry.date)}</span>
+            <span class="tag">{sourceLabel[entry.source] ?? entry.source}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section id="appearances">
+    <h2># appearances</h2>
+    <ul class="rows">
+      {talks.map((t) => (
+        <li class="row">
+          {t.url ? <a href={t.url} target="_blank" rel="noopener">{t.title}</a> : <span>{t.title}</span>}
+          <span class="meta mono muted">
+            <span>{t.event}</span>
+            <span class="date">{fmt(t.date)}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  </section>
 </Base>
+
+<style>
+  .intro { padding-top: 1rem; }
+  .prompt { font-size: 0.9rem; margin-bottom: 0.25rem; }
+  h1 { font-size: 2rem; margin: 0.25rem 0; }
+  .tagline { font-size: 1.05rem; max-width: 34rem; }
+
+  .cards { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.25rem; }
+  .cards h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+  .cards p { margin: 0; }
+
+  .rows { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.9rem; }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .row > a, .row > span:first-child { flex: 1 1 20rem; }
+  .meta { display: inline-flex; gap: 0.75rem; font-size: 0.85rem; white-space: nowrap; }
+  .tag { color: var(--accent-2); }
+</style>
