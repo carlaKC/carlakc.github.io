@@ -37,8 +37,7 @@
 * { box-sizing: border-box; }
 
 html { color-scheme: dark light; }
-:root[data-theme="light"] html,
-html:has(:root[data-theme="light"]) { color-scheme: light; }
+:root[data-theme="light"] { color-scheme: light; }
 
 body {
   margin: 0;
