@@ -26,7 +26,9 @@ const dateStr = post.data.date.toISOString().slice(0, 10);
   </div>
 
   <style>
-    article { padding-top: clamp(2.5rem, 6vw, 4rem); }
+    /* clear the overlay header */
+    article { padding-top: 5rem; }
+    @media (max-width: 34rem) { article { padding-top: 6.5rem; } }
     .back {
       display: inline-block;
       margin-bottom: 2rem;

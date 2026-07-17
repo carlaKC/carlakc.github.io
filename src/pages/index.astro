@@ -93,11 +93,12 @@ const sourceLabel = { post: 'Essay', delving: 'Delving Bitcoin', external: 'Exte
 </Base>
 
 <style>
-  /* Fill the whole first screen so the sheet (About) stays below the fold at
-     any viewport size; 100vh == the large viewport, so it never peeks. */
+  /* Fill the visible screen and centre the name in it. 100dvh tracks the
+     dynamic viewport (address bar in/out) so the name stays mid-screen on
+     mobile, and the sheet (About) still starts just below the fold. */
   .intro {
     min-height: 100vh;
-    min-height: 100lvh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
   }
