@@ -1,0 +1,9 @@
+Manrope typeface
+Copyright (c) Mikhail Sharanda (https://github.com/sharanda/manrope)
+
+Licensed under the SIL Open Font License, Version 1.1.
+Full license text: https://openfontlicense.org/open-font-license-official-text/
+Upstream project: https://github.com/sharanda/manrope
+
+The font file in this directory (manrope-variable.woff2) is a latin-subset
+variable build distributed via the Fontsource project (https://fontsource.org).

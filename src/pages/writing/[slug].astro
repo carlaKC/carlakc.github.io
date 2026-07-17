@@ -12,16 +12,43 @@ const { Content } = await render(post);
 const dateStr = post.data.date.toISOString().slice(0, 10);
 ---
 <Base title={`${post.data.title} — Carla Kirk-Cohen`} description={post.data.description}>
-  <article>
-    <a href="/#writing" class="mono muted">&larr; writing</a>
-    <h1>{post.data.title}</h1>
-    <p class="muted mono">{dateStr}</p>
-    <Content />
-  </article>
+  <div class="sheet">
+    <div class="wrap">
+      <article>
+        <a href="/#writing" class="back">&larr; Writing</a>
+        <h1>{post.data.title}</h1>
+        <p class="meta">{dateStr}</p>
+        <div class="prose">
+          <Content />
+        </div>
+      </article>
+    </div>
+  </div>
 
   <style>
-    article { padding-top: 1rem; }
-    article :global(h2) { font-size: 1.3rem; margin-top: 2rem; }
-    article :global(p) { line-height: 1.7; }
+    article { padding-top: clamp(2.5rem, 6vw, 4rem); }
+    .back {
+      display: inline-block;
+      margin-bottom: 2rem;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .back:hover { color: var(--terracotta); text-decoration: none; }
+    article h1 {
+      font-size: clamp(2rem, 3vw + 1rem, 2.7rem);
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      line-height: 1.1;
+    }
+    .meta {
+      margin: 0.9rem 0 2.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .prose :global(h2) { font-size: 1.4rem; font-weight: 600; margin: 2.4rem 0 0.8rem; }
+    .prose :global(h3) { font-size: 1.15rem; font-weight: 600; margin: 2rem 0 0.6rem; }
+    .prose :global(p) { line-height: 1.75; }
+    .prose :global(a) { text-decoration: underline; text-decoration-thickness: 1px; }
   </style>
 </Base>

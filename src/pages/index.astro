@@ -9,91 +9,135 @@ import appearances from '../data/appearances.json';
 const posts = await getCollection('writing', ({ data }) => !data.draft);
 const writing = mergeWritingEntries(posts, writingLinks);
 
-// Appearances render in curated file order (not date-sorted).
-const talks = appearances;
+// Appearances sorted most to least recent.
+const talks = [...appearances].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-const fmt = (d) => (d instanceof Date ? d : new Date(d)).toISOString().slice(0, 7);
-const sourceLabel = { post: 'post', delving: 'delving ↗', external: 'external ↗' };
+const year = (d) => (d instanceof Date ? d : new Date(d)).getUTCFullYear();
+const sourceLabel = { post: 'Essay', delving: 'Delving Bitcoin', external: 'External' };
 ---
 <Base>
-  <section id="intro" class="intro">
-    <p class="prompt mono muted">carla@web:~$</p>
-    <h1>Carla Kirk-Cohen</h1>
-    <p class="tagline muted">Bitcoin &amp; Lightning Network protocol developer.</p>
+  <section id="intro" class="intro reveal">
+    <div class="wrap">
+      <h1>Carla Kirk-Cohen</h1>
+      <p class="byline">Caring a whole lot, crying a little, building good things with good people</p>
+    </div>
   </section>
 
-  <section id="about">
-    <h2># about</h2>
-    <p>Hi, I'm Carla!</p>
-    <p>I care about working on technology that improves the world around me. I currently work on Bitcoin because I believe that money that can't be censored or corrupted is an important principle. Through this work, I've been fortunate to spend most of my career in open source software development. I value being surrounded by people who care deeply about what they do and choose to do the right thing rather than the easy thing.</p>
-  </section>
+  <div class="sheet">
+    <div class="wrap">
+      <section id="about" class="section reveal">
+        <p class="label">About</p>
+        <div class="lead">
+          <p>Hi, I'm Carla!</p>
+          <p>I care about working on technology that improves the world around me. I currently work on Bitcoin because I believe that money that can't be censored or corrupted is an important principle. Through this work, I've been fortunate to spend most of my career in open source software development. I value being surrounded by people who care deeply about what they do and choose to do the right thing rather than the easy thing.</p>
+        </div>
+      </section>
 
-  <section id="working-on">
-    <h2># working on</h2>
-    <ul class="cards">
-      {workingOn.map((item) => (
-        <li>
-          <h3>
-            {item.url ? <a href={item.url}>{item.title}</a> : item.title}
-          </h3>
-          <p class="muted">{item.blurb}</p>
-        </li>
-      ))}
-    </ul>
-  </section>
+      <section id="working-on" class="section reveal">
+        <p class="label">Working on</p>
+        <ul class="entries">
+          {workingOn.map((item) => (
+            <li>
+              <h2 class="entry-title">
+                {item.url ? <a href={item.url} target="_blank" rel="noopener">{item.title}</a> : item.title}
+              </h2>
+              <p>
+                {item.blurb.map((seg) =>
+                  typeof seg === 'string'
+                    ? seg
+                    : <a href={seg.url} target="_blank" rel="noopener">{seg.text}</a>
+                )}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-  <section id="writing">
-    <h2># writing</h2>
-    <ul class="rows">
-      {writing.map((entry) => (
-        <li class="row">
-          <a href={entry.href} {...(entry.external ? { target: '_blank', rel: 'noopener' } : {})}>
-            {entry.title}
-          </a>
-          <span class="meta mono muted">
-            <span class="date">{fmt(entry.date)}</span>
-            <span class="tag">{sourceLabel[entry.source] ?? entry.source}</span>
-          </span>
-        </li>
-      ))}
-    </ul>
-  </section>
+      <section id="writing" class="section reveal">
+        <p class="label">Writing</p>
+        <p class="subhead">Sometimes I write about my work</p>
+        <ul class="index">
+          {writing.map((entry) => (
+            <li>
+              <a class="title" href={entry.href} {...(entry.external ? { target: '_blank', rel: 'noopener' } : {})}>
+                {entry.title}
+              </a>
+              <span class="meta">
+                <span class="tag">{sourceLabel[entry.source] ?? entry.source}</span>
+                <span class="date">{year(entry.date)}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-  <section id="appearances">
-    <h2># appearances</h2>
-    <ul class="rows">
-      {talks.map((t) => (
-        <li class="row">
-          {t.url ? <a href={t.url} target="_blank" rel="noopener">{t.title}</a> : <span>{t.title}</span>}
-          <span class="meta mono muted">
-            <span>{t.event}</span>
-            <span class="date">{fmt(t.date)}</span>
-          </span>
-        </li>
-      ))}
-    </ul>
-  </section>
+      <section id="appearances" class="section reveal">
+        <p class="label">Appearances</p>
+        <p class="subhead">Sometimes I talk about my work</p>
+        <ul class="index">
+          {talks.map((t) => (
+            <li>
+              {t.url
+                ? <a class="title" href={t.url} target="_blank" rel="noopener">{t.title}</a>
+                : <span class="title">{t.title}</span>}
+              <span class="meta">
+                <span>{t.event}</span>
+                <span class="date">{year(t.date)}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
 </Base>
 
 <style>
-  .intro { padding-top: 1rem; }
-  .prompt { font-size: 0.9rem; margin-bottom: 0.25rem; }
-  h1 { font-size: 2rem; margin: 0.25rem 0; }
-  .tagline { font-size: 1.05rem; max-width: 34rem; }
-
-  .cards { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.25rem; }
-  .cards h3 { margin: 0 0 0.25rem; font-size: 1rem; }
-  .cards p { margin: 0; }
-
-  .rows { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.9rem; }
-  .row {
+  /* Fill the whole first screen so the sheet (About) stays below the fold at
+     any viewport size; 100vh == the large viewport, so it never peeks. */
+  .intro {
+    min-height: 100vh;
+    min-height: 100lvh;
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
-    flex-wrap: wrap;
+    align-items: center;
   }
-  .row > a, .row > span:first-child { flex: 1 1 20rem; }
-  .meta { display: inline-flex; gap: 0.75rem; font-size: 0.85rem; white-space: nowrap; }
-  .tag { color: var(--accent-2); }
+  .intro .wrap {
+    position: relative;
+    width: 100%;
+    padding-block: 2rem;
+  }
+  /* soft cream scrim so the type stays legible over the artwork */
+  .intro .wrap::before {
+    content: "";
+    position: absolute;
+    inset: -1.5rem -1rem;
+    z-index: -1;
+    background: var(--paper);
+    opacity: 0.26;
+    filter: blur(34px);
+    border-radius: 44px;
+  }
+  .intro .wrap > * { position: relative; }
+  .intro h1 {
+    font-size: clamp(2.5rem, 5vw + 1rem, 3.6rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.04;
+  }
+  .byline {
+    margin: 1.3rem 0 0;
+    max-width: 28rem;
+    color: var(--terracotta-ink);
+    font-size: clamp(1.1rem, 0.95rem + 0.6vw, 1.28rem);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .lead p {
+    font-size: 1.12rem;
+    line-height: 1.75;
+  }
+  .lead p:first-child {
+    color: var(--terracotta-ink);
+    font-weight: 500;
+  }
 </style>

@@ -1,12 +1,25 @@
 [
   {
-    "title": "Placeholder project one",
-    "blurb": "Short placeholder description of something Carla is currently working on. Replace with real copy.",
-    "url": "https://github.com/lightning/bolts"
+    "title": "Channel Jamming",
+    "url": "https://github.com/lightning/bolts/issues/1218",
+    "blurb": [
+      "My primary focus is the specification, implementation, and deployment of a mitigation for channel jamming attacks on the Lightning Network. This is a decade-old unsolved problem for the network. This work was collaboratively adapted from ",
+      { "text": "Clara Shikhelman's original paper", "url": "https://eprint.iacr.org/2022/1454" },
+      ". More recently, I've become interested in automating the testing of these mitigations against AI-driven adversaries."
+    ]
   },
   {
-    "title": "Placeholder project two",
-    "blurb": "Another placeholder description. Replace with real copy.",
-    "url": ""
+    "title": "BitDevs NYC",
+    "url": "https://bitdevs.org",
+    "blurb": [
+      "I co-host the BitDevs NYC meetup, where we gather monthly to discuss technical developments in Bitcoin and related technologies. We're proud to provide strong technical signal in an industry that is often overrun with price talk and hype. The meetup follows a Socratic seminar format and is driven largely by the interests and contributions of its attendees."
+    ]
+  },
+  {
+    "title": "Rust Lightning",
+    "url": "https://git.rust-bitcoin.org/lightningdevkit/rust-lightning",
+    "blurb": [
+      "I occasionally contribute to the implementation and review of protocol features in rust-lightning, one of the major Lightning Network implementations. Protocol features I've contributed code or review to include v3 channels, attributable errors, and trampoline routing."
+    ]
   }
 ]

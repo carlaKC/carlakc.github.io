@@ -1,0 +1,55 @@
+---
+const socials = [
+  { label: 'X', url: 'https://x.com/actuallyCarlaKC' },
+  { label: 'GitHub', url: 'https://github.com/carlaKC' },
+  { label: 'LinkedIn', url: 'https://www.linkedin.com/in/carla-kirk-cohen-73342113b/' },
+  { label: 'rust-bitcoin', url: 'https://git.rust-bitcoin.org/carlakc' },
+];
+---
+<footer class="site-footer">
+  <div class="inner">
+    <p class="foot-name">Carla Kirk-Cohen</p>
+    <nav class="socials" aria-label="Social links">
+      {socials.map((s) => (
+        <a href={s.url} target="_blank" rel="noopener me">{s.label}</a>
+      ))}
+    </nav>
+  </div>
+</footer>
+
+<style>
+  /* parchment only as wide as the column, matching .sheet */
+  .inner {
+    max-width: var(--measure);
+    margin: 0 auto;
+    background: var(--paper);
+    border-top: 1px solid var(--hairline);
+    padding: 2rem 1.5rem 3rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+  }
+  .foot-name {
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--ink);
+  }
+  .socials {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .socials a {
+    color: var(--muted);
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+  }
+  .socials a:hover { color: var(--terracotta); text-decoration: none; }
+
+  @media (max-width: 34rem) {
+    .socials { gap: 1rem; }
+  }
+</style>

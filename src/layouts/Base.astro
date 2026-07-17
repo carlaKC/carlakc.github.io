@@ -1,6 +1,7 @@
 ---
-import '../styles/solarized.css';
+import '../styles/theme.css';
 import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 
 interface Props {
   title?: string;
@@ -8,33 +9,60 @@ interface Props {
 }
 const {
   title = 'Carla Kirk-Cohen',
-  description = 'Carla Kirk-Cohen — Lightning Network protocol development.',
+  description = 'Carla Kirk-Cohen — Bitcoin & Lightning Network protocol development.',
 } = Astro.props;
 ---
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="icon" href="/bio-photo.jpg" />
-    <script is:inline>
-      (function () {
-        try {
-          const stored = localStorage.getItem('theme');
-          const theme = stored
-            ? stored
-            : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-          document.documentElement.dataset.theme = theme;
-        } catch (e) {
-          document.documentElement.dataset.theme = 'dark';
-        }
-      })();
-    </script>
+    <link rel="icon" href="data:," />
+    <link
+      rel="preload"
+      href="/fonts/manrope-variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="preload" href="/background.webp" as="image" type="image/webp" />
   </head>
   <body>
+    <!-- Fixed artwork background — static as the content scrolls over it. -->
+    <div class="page-bg" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
     <Nav />
     <main><slot /></main>
+    <Footer />
+
+    <script>
+      // Slow, minimal motion — reveal sections on scroll. The background is
+      // fixed and never competes with the typography.
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const revealables = document.querySelectorAll('.reveal');
+
+      if (!reduce && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('in');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+        );
+        revealables.forEach((el) => io.observe(el));
+      } else {
+        revealables.forEach((el) => el.classList.add('in'));
+      }
+    </script>
   </body>
 </html>
