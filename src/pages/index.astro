@@ -9,7 +9,8 @@ import appearances from '../data/appearances.json';
 const posts = await getCollection('writing', ({ data }) => !data.draft);
 const writing = mergeWritingEntries(posts, writingLinks);
 
-const talks = [...appearances].sort((a, b) => new Date(b.date) - new Date(a.date));
+// Appearances render in curated file order (not date-sorted).
+const talks = appearances;
 
 const fmt = (d) => (d instanceof Date ? d : new Date(d)).toISOString().slice(0, 7);
 const sourceLabel = { post: 'post', delving: 'delving ↗', external: 'external ↗' };

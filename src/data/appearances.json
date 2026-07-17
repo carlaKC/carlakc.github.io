@@ -1,14 +1,32 @@
 [
   {
-    "title": "Placeholder talk or podcast",
-    "event": "Placeholder Event / Venue",
-    "date": "2025-01-01",
-    "url": "https://example.com"
+    "title": "A Hybrid Solution To Unjamming Lightning",
+    "event": "TABConf 2023",
+    "date": "2023-10-26",
+    "url": "https://www.youtube.com/watch?v=ATPtbO3awcQ"
   },
   {
-    "title": "Another placeholder appearance",
-    "event": "Placeholder Conference",
-    "date": "2024-06-01",
-    "url": ""
+    "title": "Bitcoin Dev Culture",
+    "event": "The Peter McCormack Show",
+    "date": "2024-02-05",
+    "url": "https://www.youtube.com/watch?v=VRDNtfLmbFU"
+  },
+  {
+    "title": "Bitcoin Optech Newsletter #356 Recap Podcast",
+    "event": "Bitcoin Optech Podcast",
+    "date": "2025-06-03",
+    "url": "https://bitcoinops.org/en/podcast/2025/06/03/"
+  },
+  {
+    "title": "Lightning for Financial Freedom",
+    "event": "Human Rights Foundation",
+    "date": "2021-11-24",
+    "url": "https://www.youtube.com/watch?v=Y5wgZ3rFayQ"
+  },
+  {
+    "title": "Network topology creation & maintenance",
+    "event": "Dev++ · Bitcoin Edge",
+    "date": "2020-03-02",
+    "url": "https://www.youtube.com/watch?v=j2l_Ut4k1qI"
   }
 ]
