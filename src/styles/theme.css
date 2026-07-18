@@ -80,7 +80,7 @@ main,
 .site-footer { position: relative; z-index: 2; }
 
 /* Header overlays the hero (doesn't take flow space), so the intro can
-   centre its content in the full viewport rather than below the header. */
+   center its content in the full viewport rather than below the header. */
 .site-header {
   position: absolute;
   top: 0;
