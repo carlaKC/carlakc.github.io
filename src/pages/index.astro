@@ -27,10 +27,26 @@ const sourceLabel = { post: 'Essay', delving: 'Delving Bitcoin', external: 'Exte
     <div class="wrap">
       <section id="about" class="section reveal">
         <p class="label">About</p>
-        <div class="lead">
-          <p>Hi, I'm Carla!</p>
-          <p>I care about working on technology that improves the world around me. I currently work on Bitcoin because I believe that money that can't be censored or corrupted is an important principle. Through this work, I've been fortunate to spend most of my career in open source software development. I value being surrounded by people who care deeply about what they do and choose to do the right thing rather than the easy thing.</p>
-        </div>
+
+        <h3 class="sub">About Me</h3>
+        <p>Being of service to others is how I derive meaning from my experience on this strange, wet, spinning rock that we find ourselves on. I care deeply about people who care, and not much about those who don't. I love musical theatre and team sports in equal measure because they both represent a community of people committing to care about something together.</p>
+        <p>In my personal life, this means cooking elaborate meals for my loved ones, showing up frighteningly on time (no matter what the NYC subway throws at me), and honouring my commitments—no flaking, no ghosting. Professionally, it means working on technology that I believe can solve real problems for real people.</p>
+
+        <h3 class="sub">Impactful Technology</h3>
+        <p>I was fourteen when the hyperinflation crisis in Zimbabwe sent economic refugees fleeing to South Africa, my home country, in search of work. I was just old enough to understand the injustice of seeing a man holding his PhD standing at the side of the road asking for work as a gardener.</p>
+        <p>When I entered the workforce, I was drawn to Bitcoin because its value proposition seemed so obvious. Here was a technology that could help.</p>
+        <p>Things haven't quite played out the way my starry-eyed twenty-two-year-old self imagined. Bitcoin has, by and large, benefited people in the West who are at comparatively less risk of currency devaluation, and it has struggled to make inroads where it matters most.</p>
+        <p>But there are small pockets where Bitcoin has done exactly what it set out to do—funding the EndSARS protests in Nigeria, supporting journalists in Belarus, and paying women in Afghanistan. I'm proud to work on technology that has made a real difference in people's lives, even if it hasn't yet fulfilled the vision that first drew me to it.</p>
+
+        <h3 class="sub">Complex and Adversarial Systems</h3>
+        <p>I've spent my entire career working on Bitcoin because it offers an endless supply of interesting technical problems. Open an engineering textbook to a random page - networking, distributed systems, cryptography - and you're almost guaranteed to find a topic that's relevant somewhere in the Bitcoin ecosystem.</p>
+        <p>The TV series <em>Mr. Robot</em> came out during the final year of my undergraduate degree (nearly sabotaging said degree through multiple watches and rewatches) and instilled in me a lifelong desire to be a cool, tortured hacker in a hoodie. Working on distributed systems in adversarial environments has been an absolute thrill ever since.</p>
+        <p>Ironically, for the age we find ourselves living in, machine learning and AI are among the few topics Bitcoin doesn't naturally expose you to. I've greatly enjoyed starting from scratch in a new domain and learning how many of the same questions around robustness, incentives, and adversarial behavior emerge in a completely different environment. I've also had some fun testing my own work against AI-driven adversaries. At least, when I'm not being thwarted by Fable's guardrails.</p>
+
+        <h3 class="sub">People Who Care</h3>
+        <p>I came to my career in open-source development by way of the 2019 Chaincode Residency. My manager, Adam Jonas, took a chance on me, and my life was forever changed for it. Watching someone go out to bat for me in the way that he did was formative.</p>
+        <p>Since then, I've tried to pay that opportunity forward in whatever ways I can. Sometimes that means serving on grant-giving boards or starting training programmes where I think good people can flourish. Sometimes it means working one-on-one with junior developers to help accelerate their growth. Sometimes it just means keeping an eye on who's showing up on GitHub and making sure they're in the right rooms with the right people.</p>
+        <p>At the end of my career, I'll be happy if I can say that I went out to bat for people who cared deeply, chose the hard thing over the easy one, and built big, beautiful things together.</p>
       </section>
 
       <section id="working-on" class="section reveal">
@@ -133,12 +149,14 @@ const sourceLabel = { post: 'Essay', delving: 'Delving Bitcoin', external: 'Exte
     font-weight: 400;
     line-height: 1.5;
   }
-  .lead p {
-    font-size: 1.12rem;
-    line-height: 1.75;
+  /* sub-headings within the About section */
+  .sub {
+    margin: 2.8rem 0 0.9rem;
+    font-size: 1.32rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.25;
   }
-  .lead p:first-child {
-    color: var(--terracotta-ink);
-    font-weight: 500;
-  }
+  .sub:first-of-type { margin-top: 0.4rem; }
+  #about p { line-height: 1.75; }
 </style>
