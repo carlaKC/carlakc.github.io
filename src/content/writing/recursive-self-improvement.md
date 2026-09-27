@@ -179,6 +179,53 @@ To build some intuition for how these pieces interact, I’ll bring them togethe
 
 To interact with the model, you can choose a reasonable starting state based on where you think we are today, and set your beliefs about the capabilities and bottlenecks we’ll see in the future.
 
+<figure class="rsi-model">
+  <iframe data-autosize data-share-params allow="clipboard-write" src="/writing/recursive-self-improvement/rsi-model.html" title="Interactive back-of-envelope model of recursive self-improvement" loading="lazy" style="display:block;width:100%;height:2000px;border:0;"></iframe>
+</figure>
+
+<script is:inline>
+  // Shared links: pass settings in the post's URL on to the model
+  if (location.search) {
+    const model = document.querySelector("iframe[data-share-params]");
+    if (model) model.src = model.getAttribute("src") + location.search;
+  }
+
+  // Size embedded interactives to their content
+  window.addEventListener("message", (e) => {
+    if (e.origin !== location.origin || !e.data || e.data.type !== "embed-height") return;
+    document.querySelectorAll("iframe[data-autosize]").forEach((f) => {
+      if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+    });
+  });
+</script>
+
+<p class="share-prompt">Want to share or keep this? <button type="button" class="share-link" id="share-intuition">Share your intuition</button><span class="share-toast" id="share-toast" role="status" aria-live="polite"></span></p>
+
+<script is:inline>
+  // "Share your intuition": copy a link that reopens the model with the reader's settings
+  (() => {
+    let query = location.search.slice(1);
+    window.addEventListener("message", (e) => {
+      if (e.origin === location.origin && e.data && e.data.type === "model-settings") query = e.data.query;
+    });
+    const button = document.getElementById("share-intuition");
+    const toast = document.getElementById("share-toast");
+    let timer = null;
+    const say = (text) => {
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(timer);
+      timer = setTimeout(() => toast.classList.remove("show"), 2500);
+    };
+    button.addEventListener("click", () => {
+      const url = location.origin + location.pathname + (query ? "?" + query : "") + "#back-of-envelope";
+      const copied = () => say("Link copied");
+      const failed = () => { history.replaceState(null, "", url); say("Copy the link from your address bar"); };
+      try { navigator.clipboard.writeText(url).then(copied, failed); } catch (err) { failed(); }
+    });
+  })();
+</script>
+
 ## Expert Projections
 
 Trying to work out when AI research will be automated, and what happens afterwards, is really a modelling problem that could easily be a full-time job. The best I can reasonably do here is build some intuition from the evidence above, then compare that intuition against people who have spent much more time thinking about it.

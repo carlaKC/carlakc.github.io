@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Simple RSI Takeoff</title>
+<style>
+  @font-face {
+    font-family: "Manrope";
+    src: url("/fonts/manrope-variable.woff2") format("woff2-variations");
+    font-weight: 200 800;
+    font-style: normal;
+    font-display: swap;
+  }
+  /* Follows carlakc.github.io theme.css ("Red Fuji"), plus the sea blue from
+     blog-background.webp for the graph line and selected controls. */
+  :root {
+    color-scheme: light;
+    --paper: #efe6d5;
+    --paper-2: #e4d8c0;
+    --terracotta: #b04a32;
+    --terracotta-ink: #963f2b;
+    --blue: #7e97a4;
+    --ink: #2a2521;
+    --muted: #6a6155;
+    --hairline: rgba(42, 37, 33, 0.13);
+    --hairline-strong: rgba(42, 37, 33, 0.24);
+    --sea: #253b55;
+    --sea-2: #3a4f62;
+    --font: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --transition: 160ms ease;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.72;
+    letter-spacing: 0.005em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .wrap {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding-inline: 1.5rem;
+    padding-block: 2.5rem 3.5rem;
+  }
+  @media (max-width: 34rem) { .wrap { padding-inline: 16px; } }
+  body { margin: 0; }
+  html.embedded .wrap { max-width: none; padding: 0 0 0.5rem; }
+  html.embedded .share, html.embedded .share-url { display: none !important; }   /* the post shows its own share link */
+
+  .chart { padding-block: 2rem; border-top: 1px solid var(--hairline); display: grid; gap: 1rem; }
+  section.first { border-top: 0; padding-top: 0; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; touch-action: pan-y; }
+  svg text { font-family: var(--font); font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  svg .axis-title { font-size: 12px; font-weight: 500; }
+  svg .note { font-size: 12px; font-weight: 500; cursor: help; }
+  svg .readout text { fill: var(--ink); font-size: 12px; }
+
+  /* editorial section rhythm, as on the blog */
+  section {
+    border-top: 1px solid var(--hairline);
+    padding-block: clamp(2rem, 5vw, 2.8rem);
+    display: grid;
+    gap: 1.4rem;
+  }
+  h2 {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.2rem 2.5rem;
+  }
+  .ctl { display: grid; gap: 0.55rem; align-content: start; }
+  .ctl-head { display: flex; justify-content: space-between; gap: 0.75rem; align-items: baseline; }
+  .ctl-head label, .ctl-head .lbl { font-weight: 500; font-size: 1rem; line-height: 1.4; color: var(--ink); }
+  .val { font-weight: 600; color: var(--sea); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .hint { font-size: 0.82rem; line-height: 1.55; color: var(--muted); }
+
+  .num { display: flex; align-items: baseline; gap: 0.5rem; }
+  .num input {
+    width: 5.5rem;
+    font: 500 0.95rem var(--font);
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    border-radius: 3px;
+    padding: 0.3rem 0.5rem;
+    font-variant-numeric: tabular-nums;
+    transition: border-color var(--transition);
+  }
+  .num input:hover { border-color: var(--muted); }
+  .num span { color: var(--muted); font-size: 0.85rem; }
+
+  .seg { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+  .seg button {
+    flex: 1;
+    min-width: 3.5rem;
+    font: 500 0.85rem var(--font);
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    border-radius: 3px;
+    padding: 0.4rem 0.5rem;
+    cursor: pointer;
+    transition: border-color var(--transition), background-color var(--transition), color var(--transition);
+  }
+  .seg button:hover { color: var(--terracotta); border-color: var(--muted); }
+  .seg button[aria-pressed="true"] { background: var(--sea); border-color: var(--sea); color: var(--paper); }
+  .seg button[aria-pressed="true"]:hover { background: var(--sea-2); color: var(--paper); }
+
+  /* scenario presets: the one shaded strip on the page */
+  .scenarios {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.7rem 1.4rem;
+    background: rgba(126, 151, 164, 0.2);   /* theme --blue, translucent */
+    border-radius: 3px;
+    padding: 1rem 1.1rem 1.1rem;
+  }
+  .scenarios-label { line-height: 1.5; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--sea-2); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tabs button {
+    font: 500 0.9rem var(--font);
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--hairline-strong);
+    border-radius: 3px;
+    padding: 0.35rem 0.8rem;
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition), background-color var(--transition);
+  }
+  .tabs button:hover { color: var(--terracotta); border-color: var(--muted); }
+  .tabs button[aria-pressed="true"] { background: var(--sea); border-color: var(--sea); color: var(--paper); }
+  .scenarios-body { display: grid; gap: 0.55rem; }
+  .chart-title { margin-top: 1rem; }
+  .scenario-desc { margin: 0; font-size: 0.85rem; line-height: 1.5; color: var(--sea-2); }
+  @media (max-width: 34rem) { .scenarios { grid-template-columns: 1fr; } .scenarios-label br { display: none; } }
+  @media (max-width: 34rem) { .grid { grid-template-columns: 1fr; } }
+  .intro { margin: -0.4rem 0 0; font-size: 0.92rem; color: var(--muted); max-width: 38rem; }
+
+  .chart-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.6rem 1.2rem; }
+  .share { display: flex; align-items: center; gap: 0.7rem; }
+  .share-status { font-size: 0.82rem; color: var(--sea-2); }
+  .share button {
+    font: 500 0.88rem var(--font);
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    border-radius: 3px;
+    padding: 0.35rem 0.8rem;
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition);
+  }
+  .share button:hover { color: var(--terracotta); border-color: var(--muted); }
+  .share-url {
+    width: 100%;
+    font: 400 0.85rem var(--font);
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    border-radius: 3px;
+    padding: 0.4rem 0.55rem;
+  }
+  .legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.6rem; font-size: 0.82rem; color: var(--muted); padding-left: 56px; }
+  .legend span { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .sw { display: inline-block; width: 22px; height: 0; }
+  .sw-model { border-top: 2.25px solid var(--sea); }
+  .sw-pace { border-top: 1.75px dashed var(--blue); }
+
+  .group { display: grid; gap: 1.1rem; }
+  .group + .group { padding-top: 1.6rem; border-top: 1px solid var(--hairline); }
+  h3 { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; background: transparent; margin: 0; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: var(--sea); border-radius: 1px; }
+  input[type="range"]::-moz-range-track { height: 2px; background: var(--sea); border-radius: 1px; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px; border-radius: 50%; background: var(--terracotta); border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--terracotta-ink); }
+  input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--terracotta); border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--terracotta-ink); }
+
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <section class="first">
+    <h2>Starting state</h2>
+    <div class="grid" id="start"></div>
+  </section>
+
+  <div class="chart">
+    <div class="scenarios">
+      <span class="scenarios-label" id="presets-l">Preset<br>scenarios</span>
+      <div class="scenarios-body">
+        <div class="tabs" role="group" aria-labelledby="presets-l" id="presets"></div>
+        <p class="scenario-desc" id="scenario-desc" aria-live="polite"></p>
+      </div>
+    </div>
+    <h2 class="chart-title">Projected progress</h2>
+    <svg id="plot" viewBox="0 0 800 400" role="img" aria-label="Progress over time, in years of progress at today's pace"></svg>
+    <div class="chart-foot">
+      <div class="legend">
+        <span><i class="sw sw-model"></i>Your model</span>
+        <span><i class="sw sw-pace"></i>Today's pace</span>
+      </div>
+      <div class="share">
+        <span class="share-status" id="share-status" aria-live="polite"></span>
+        <button type="button" id="share-btn">Share your intuition</button>
+      </div>
+    </div>
+    <input class="share-url" id="share-url" type="text" readonly hidden aria-label="Link to your view">
+  </div>
+
+
+  <section id="beliefs">
+    <h2>Beliefs</h2>
+    <p class="intro">Change any setting below to form your own view of how recursive self-improvement could play out.</p>
+    <div class="group">
+      <h3>Capabilities</h3>
+      <div class="grid" id="beliefs-can"></div>
+    </div>
+    <div class="group">
+      <h3>Bottlenecks</h3>
+      <div class="grid" id="beliefs-back"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const START = 2026.75, YEARS = 10, DT = 1 / 52;
+  const WALL_YEAR = 2030;          // human data runs out, on today's trend
+  const SOFT_CEIL = 12;            // software efficiency ceiling, OOMs above today (Forethought)
+  const HARD_CEIL = 11;            // compute ceiling, OOMs above today: Earth energy ~5 + chip efficiency ~6 (Forethought)
+  const A_LAB = 0.5;               // CES weight on research labour vs experiment compute
+  const S_AI0 = 2;                 // AI speed on automated tasks today (x human); scales with effective compute
+
+  const STARTING = [
+    { id: "f0", label: "Research automated", unit: "%", def: 60, min: 0, max: 99, step: 1,
+      hint: "Share of research tasks AI can do today" },
+    { id: "sNow", label: "Software efficiency growth", unit: "×/yr", def: 2, min: 1.1, max: 10, step: 0.1,
+      hint: "Algorithmic progress today" },
+    { id: "cNow", label: "Compute growth", unit: "×/yr", def: 3.5, min: 1, max: 10, step: 0.1,
+      hint: "Holds until 2030" },
+    { id: "lag0", label: "Deployment lag", unit: "yr", def: 1, min: 0.1, max: 3, step: 0.1,
+      hint: "Time for a research gain to reach a deployed model" },
+  ];
+
+  const BELIEFS = [
+    { id: "r", group: "back", label: "Difficulty of innovation", def: "medium",
+      options: { low: 2.0, medium: 1.2, high: 0.7 },   // returns to research r: harder to find new ideas = lower r
+      hint: { low: "Good new ideas stay easy to find, so improvements compound", medium: "New ideas get harder to find at about the pace research grows", high: "Each new idea is harder to find than the last, so progress fades" } },
+    { id: "cap", group: "can", label: "Research AI can eventually do alone", slider: true, def: 90, max: 100, step: 1 },
+    { id: "boost", group: "can", label: "Research boost from better models", def: "medium",
+      options: { low: [8, 10], medium: [4, 100], high: [2, Infinity] },   // [capability steps to reach the cap, AI speed limit vs a human]
+      hint: { low: "Better models take over research slowly, and automated work runs at most 10× human speed", medium: "Better models take over research steadily, and automated work runs up to 100× human speed", high: "Better models quickly take over research and run it with no speed limit" } },
+    { id: "lag", group: "can", label: "Deployment lag can shrink", def: "some",
+      options: { none: 1, some: 1 / 3, "a lot": 1 / 12 },
+      hint: {} },
+    { id: "hw", group: "can", label: "AI speeds up hardware", def: "low",
+      options: { none: [0, 0], low: [0.1, 3], medium: [0.25, 1.5], high: [0.5, 0.5] },   // [boost per 10x faster research, years before it reaches compute]
+      hint: { none: "Chips and power are built at today's pace", low: "Buildout speeds up a little, about 3 years later", medium: "Buildout speeds up noticeably, about 18 months later", high: "Machines build the machines: a big speed-up, about 6 months later" } },
+    { id: "data", group: "back", label: "Data shortage", def: "medium",
+      options: { none: 0, low: 0.3, medium: 0.6, high: 0.85 },
+      hint: { none: "Models generate all the useful data they need", low: "Models and AI research slow a little once human data runs out", medium: "Models and AI research slow a lot once human data runs out", high: "Models and AI research nearly stall once human data runs out" } },
+    { id: "compute", group: "back", label: "Compute shortage", def: "medium",
+      options: { none: [1, null], low: [0.7314, -0.1], medium: [0.4692, -0.4], high: [0.1455, -1] },   // [share of today's growth rate kept after 2030, CES rho]
+      hint: {} },
+    { id: "limits", group: "back", label: "Physical limits", def: "on",
+      options: { on: true, off: false },
+      hint: { on: "Software and compute stop at estimated physical ceilings", off: "No ceilings, so progress can run away" },
+      tip: "Software can't get more than about 10¹²× more efficient than today, and Earth's energy and the physics of chips cap compute at about 10¹¹× today's. Both are rough estimates." },
+  ];
+  const B = id => BELIEFS.find(x => x.id === id);
+  const DISPLAY_ORDER = ["boost", "cap", "lag", "hw", "data", "compute", "r", "limits"];
+
+  // Scenario presets set every belief; physical limits stay on
+  const PRESETS = {
+    "Slowdown":    { r: "medium", cap: 80,  boost: "low",    lag: "some",  hw: "none",   data: "medium", compute: "medium", limits: "on" },
+    "Steady pace": { r: "medium", cap: 90,  boost: "medium", lag: "some",  hw: "none",   data: "none",   compute: "low",    limits: "on" },
+    "Speedup":     { r: "low",    cap: 95,  boost: "medium", lag: "a lot", hw: "medium", data: "none",   compute: "low",    limits: "on" },
+    "Takeoff":     { r: "low",    cap: 100, boost: "high",   lag: "a lot", hw: "medium", data: "none",   compute: "none",   limits: "on" },
+  };
+  const DEFAULT_PRESET = "Steady pace";
+  const PRESET_DESC = {
+    "Slowdown": "Data and compute shortages bite, and progress falls behind today's pace.",
+    "Steady pace": "AI helps, but humans stay in the loop and progress tracks today's pace.",
+    "Speedup": "AI does 95% of research, and progress pulls well ahead of today's pace.",
+    "Takeoff": "AI does all research, and progress races to physical limits.",
+  };
+  for (const b of BELIEFS) b.def = PRESETS[DEFAULT_PRESET][b.id];
+
+  const state = {};
+  const logAddExp = (a, b) => a > b ? a + Math.log1p(Math.exp(b - a)) : b + Math.log1p(Math.exp(a - b));
+  const softplus = (x, w) => x / w > 30 ? x : w * Math.log1p(Math.exp(x / w));
+
+  function simulate(p) {
+    const f0 = Math.min(p.f0 / 100, 0.99);
+    const cap = Math.max(p.cap / 100, f0);
+    const gS0 = Math.log(p.sNow), gC0 = Math.log(p.cNow);
+    const opt = id => B(id).options[p[id]];
+    const r = opt("r");
+    const [autoSteps, speedMax] = opt("boost");
+    const lnSpeedMax = Math.log(speedMax);
+    const lag0 = p.lag0, floor = lag0 * opt("lag");
+    const b = opt("data");
+    const [cShare, rho] = opt("compute");
+    const gCL = Math.log(p.cNow) * cShare;             // post-2030 growth, relative to today's
+    const [hw, hwDelay] = opt("hw");
+    const trendRate = (gS0 + gC0) / Math.LN10;          // capability steps per year on today's trend
+    const wallStep = (WALL_YEAR - START) * trendRate;
+    const cSlowAt = WALL_YEAR - START;
+    const limitsOn = opt("limits");
+    const uMax = limitsOn ? SOFT_CEIL * Math.LN10 : Infinity;
+    const lnM0 = -Math.log((1 - f0) + f0 / S_AI0);
+
+    const N = Math.round(YEARS / DT);
+    const hist = [0];
+    const lnSAt = (t) => {
+      if (t <= 0) return t * gS0;
+      const x = t / DT, i = Math.floor(x), fr = x - i;
+      const a = hist[Math.min(i, hist.length - 1)], c = hist[Math.min(i + 1, hist.length - 1)];
+      return a + (c - a) * fr;
+    };
+    const lnSdep0 = lnSAt(-lag0);
+    // Software S = (cumulative research K)^r. Baseline research grows at gS0 / r,
+    // which keeps software growing at today's rate if nothing changes.
+    const lnK0 = Math.log(r / gS0);
+    const cMax = limitsOn ? HARD_CEIL * Math.LN10 : Infinity;
+    let lnK = lnK0, lnCraw = 0, lnC = 0, lag = lag0;
+    let softHit = null, hardHit = null;
+    const phiHist = [];                                // research speed-up history, for the hardware delay
+    const out = [];
+
+    for (let i = 0; i <= N; i++) {
+      const t = i * DT;
+      const lnSdep = lnSAt(t - lag) - lnSdep0;           // software in the deployed model
+      const raw = (lnC + lnSdep) / Math.LN10;            // steps of 10x effective compute vs today
+      const A = raw - b * softplus(raw - wallStep, 0.4); // progress slows past the data wall
+      out.push([START + t, A]);
+      if (softHit === null && lnSdep + lnSdep0 >= 0.95 * uMax) softHit = START + t;
+      if (hardHit === null && lnC >= 0.95 * cMax) hardHit = START + t;
+
+      // Research speed-up from automation (Amdahl), relative to today
+      const f = Math.min(f0 + (cap - f0) * Math.min(1, Math.max(A, 0) / autoSteps), 1);
+      // AI researchers are only as capable as the data allows (A, not raw), and capped by the speed limit
+      const lnS_AI = Math.min(Math.log(S_AI0) + Math.min(A * Math.LN10, 600), lnSpeedMax);
+      const lnM = -Math.log((1 - f) + f * Math.exp(-lnS_AI)) - lnM0;
+      // Experiment compute relative to today's trend
+      const lnX = lnC + lnSdep - (gC0 + gS0) * t;
+      let lnPhi;
+      if (rho === null) lnPhi = lnM;
+      else lnPhi = logAddExp(Math.log(A_LAB) + rho * lnM, Math.log(1 - A_LAB) + rho * lnX) / rho;
+
+      const lnR = gS0 / r * t + lnPhi;
+      lnK = logAddExp(lnK, lnR + Math.log(DT));
+      const u = r * (lnK - lnK0);
+      hist.push(u > 0 ? u / Math.pow(1 + Math.pow(u / uMax, 3), 1 / 3) : u);
+
+      const gC = t < cSlowAt ? gC0 : gCL + (gC0 - gCL) * Math.exp(-(t - cSlowAt) / 0.75);
+      phiHist.push(lnPhi);
+      const dI = Math.round(hwDelay / DT);
+      const lnPhiHw = i - dI >= 0 ? phiHist[i - dI] : 0;               // hardware feels research speed-ups after a delay
+      lnCraw += gC * (1 + hw * Math.max(lnPhiHw, 0) / Math.LN10) * DT;  // AI research speeds up hardware buildout
+      lnC = lnCraw / Math.pow(1 + Math.pow(lnCraw / cMax, 6), 1 / 6);      // bends hard near the compute ceiling
+      lag = Math.min(lag0, floor + (lag0 - floor) / Math.max(Math.exp(lnPhi), 1));
+    }
+    return { series: out, wallStep, trendRate, showWall: b > 0, showAuto: cap > f0, autoStep: autoSteps, capPct: Math.round(cap * 100), softHit, hardHit,
+             limit: limitsOn ? SOFT_CEIL + HARD_CEIL - lnSdep0 / Math.LN10 : Infinity };
+  }
+
+  // Controls
+  const $ = id => document.getElementById(id);
+  for (const p of STARTING) {
+    state[p.id] = p.def;
+    const el = document.createElement("div");
+    el.className = "ctl";
+    el.innerHTML =
+      `<div class="ctl-head"><label for="${p.id}">${p.label}</label></div>` +
+      `<div class="num"><input type="number" id="${p.id}" value="${p.def}" min="${p.min}" max="${p.max}" step="${p.step}"><span>${p.unit}</span></div>` +
+      `<div class="hint">${p.hint}</div>`;
+    $("start").append(el);
+    el.querySelector("input").addEventListener("input", e => {
+      const v = parseFloat(e.target.value);
+      if (!Number.isFinite(v)) return;
+      state[p.id] = Math.min(p.max, Math.max(p.min, v));
+      if (p.id === "f0") syncCap();
+      update();
+    });
+    // When the reader leaves the box, show the value the model is actually using
+    el.querySelector("input").addEventListener("change", e => { e.target.value = state[p.id]; });
+  }
+
+  const setters = {};
+  for (const p of DISPLAY_ORDER.map(B)) {
+    state[p.id] = p.def;
+    if (!p.slider) setters[p.id] = v => {
+      state[p.id] = v;
+      document.querySelectorAll(`[data-belief="${p.id}"] button`).forEach(x => x.setAttribute("aria-pressed", String(x.dataset.k === v)));
+    };
+    const el = document.createElement("div");
+    el.className = "ctl";
+    if (p.slider) {
+      el.innerHTML =
+        `<div class="ctl-head"><label for="${p.id}">${p.label}</label><span class="val" id="${p.id}-v"></span></div>` +
+        `<input type="range" id="${p.id}" min="30" max="${p.max}" step="${p.step}" value="${p.def}">` +
+        `<div class="hint" id="${p.id}-h"></div>`;
+      const input = el.querySelector("input");
+      input.addEventListener("input", e => { state[p.id] = +e.target.value; markPreset(null); update(); });
+      setters[p.id] = v => { state[p.id] = v; input.value = v; };
+    } else {
+      const keys = Object.keys(p.options);
+      el.innerHTML =
+        `<div class="ctl-head"><span class="lbl" id="${p.id}-l">${p.label}</span></div>` +
+        `<div class="seg" role="group" data-belief="${p.id}" aria-labelledby="${p.id}-l">` +
+        keys.map(k => `<button type="button" data-k="${k}" aria-pressed="${k === p.def}">${k[0].toUpperCase() + k.slice(1)}</button>`).join("") +
+        `</div><div class="hint" id="${p.id}-h"${p.tip ? ` title="${p.tip}"` : ""}></div>`;
+      el.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+        state[p.id] = btn.dataset.k;
+        el.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === btn)));
+        markPreset(null);
+        update();
+      }));
+    }
+    $(p.group === "can" ? "beliefs-can" : "beliefs-back").append(el);
+  }
+
+  function syncCap() {
+    const slider = $("cap");
+    const lo = Math.round(state.f0);
+    slider.min = lo;
+    if (state.cap < lo) { state.cap = lo; slider.value = lo; }
+  }
+
+  // Chart: capability shown as years of progress at today's pace
+  const svg = $("plot");
+  const W = 800, H = 400, PL = 56, PR = 16, PT = 24, PB = 34;
+  const NS = "http://www.w3.org/2000/svg";
+  const mk = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    return n;
+  };
+  function niceStep(span) {
+    const raw = span / 6, pw = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / pw;
+    return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * pw;
+  }
+  let hover = null;   // current points and scales, for the hover readout
+
+  function draw({ series, trendRate, showAuto, autoStep, capPct, softHit, hardHit }) {
+    svg.replaceChildren();
+    const yrs = v => v / trendRate;                    // capability steps -> years at today's pace
+    const pts = series.map(([t, A]) => [t, yrs(A)]);
+    const dataMax = Math.max(...pts.map(d => d[1]));
+    // Axis fits the curve only. Without limits a takeoff runs to infinity, so cap it and let the curve leave the chart
+    const yMaxRaw = Math.min(100, Math.max(12, dataMax * 1.08));
+    const step = niceStep(yMaxRaw);
+    const yMax = Math.ceil(yMaxRaw / step) * step;
+    const x = v => PL + (v - START) / YEARS * (W - PL - PR);
+    const y = v => PT + (1 - v / yMax) * (H - PT - PB);
+    const xR = W - PR;
+
+    const midY = PT + (H - PT - PB) / 2;
+    svg.append(mk("text", { x: 12, y: midY, transform: `rotate(-90 12 ${midY})`, "text-anchor": "middle", class: "axis-title" }, "Years of progress at today's pace"));
+    for (let v = 0; v <= yMax + 1e-9; v += step) {
+      if (v > 0) svg.append(mk("line", { x1: PL, x2: xR, y1: y(v), y2: y(v), stroke: "var(--hairline)", "stroke-width": 1 }));
+      if (v > 0) svg.append(mk("text", { x: PL - 10, y: y(v) + 4, "text-anchor": "end" }, String(+v.toFixed(1))));
+    }
+    const base = H - PB;
+    svg.append(mk("line", { x1: PL, x2: xR, y1: base, y2: base, stroke: "var(--hairline-strong)", "stroke-width": 1 }));
+    for (let yr = 2027; yr <= 2036; yr++) {
+      svg.append(mk("text", { x: x(yr), y: base + 22, "text-anchor": "middle" }, String(yr)));
+    }
+
+    const clip = mk("clipPath", { id: "area" });
+    clip.append(mk("rect", { x: PL, y: PT - 2, width: xR - PL, height: H - PT - PB + 2 }));
+    svg.append(clip);
+
+    // Events from the model itself, drawn as vertical lines with marginal notes
+    const event = (when, text, color, tip, row) => {
+      const hx = x(when);
+      svg.append(mk("line", { x1: hx, x2: hx, y1: PT - 4, y2: H - PB, stroke: color, "stroke-width": 1.25, "stroke-dasharray": "2 3" }));
+      const nearRight = hx > xR - 170;
+      const t = mk("text", { x: nearRight ? hx - 6 : hx + 6, y: PT + 8 + row * 16, "text-anchor": nearRight ? "end" : "start", class: "note", fill: color }, text);
+      t.append(mk("title", {}, tip));
+      svg.append(t);
+    };
+    const limTip = "Software can't get much more efficient past this point, so progress now depends on building more compute.";
+    const hwTip = "Compute has reached the limit set by Earth's energy and the physics of chips.";
+    if (softHit !== null) event(softHit, "Software hits its limit", "var(--muted)", limTip, 1);
+    if (hardHit !== null) event(hardHit, "Hardware hits its limit", "var(--muted)", hwTip, 2);
+    // The moment automation reaches the reader's cap: the one terracotta mark on the chart
+    const hit = showAuto ? series.find(([, A]) => A >= autoStep) : null;
+    if (hit) event(hit[0], capPct >= 100 ? "AI does all research" : "AI does " + capPct + "% of research", "var(--terracotta)",
+      "AI reaches your limit on research tasks it can do on its own. The rest stays with humans at human speed.", 0);
+
+    // Today's pace: one year of progress per year
+    const tEnd = START + Math.min(YEARS, yMax);
+    const paceEnd = [x(tEnd), y(tEnd - START)];
+    svg.append(mk("line", { x1: x(START), y1: y(0), x2: paceEnd[0], y2: paceEnd[1], stroke: "var(--blue)", "stroke-width": 1.75, "stroke-dasharray": "5 5", "clip-path": "url(#area)" }));
+
+    // Model curve
+    const d = pts.map((pt, i) => (i ? "L" : "M") + x(pt[0]).toFixed(1) + "," + y(Math.min(pt[1], yMax * 1.5)).toFixed(1)).join("");
+    svg.append(mk("path", { d, fill: "none", stroke: "var(--sea)", "stroke-width": 2.25, "stroke-linejoin": "round", "stroke-linecap": "round", "clip-path": "url(#area)" }));
+
+    // Hover readout layer
+    const layer = mk("g", { class: "readout", visibility: "hidden" });
+    layer.append(mk("line", { class: "rl", y1: PT, y2: H - PB, stroke: "var(--muted)", "stroke-width": 1, opacity: 0.35 }));
+    layer.append(mk("circle", { class: "rc", r: 3.5, fill: "var(--sea)" }));
+    layer.append(mk("rect", { class: "rb", height: 22, rx: 3, fill: "var(--paper)", stroke: "var(--hairline-strong)" }));
+    layer.append(mk("text", { class: "rt" }));
+    svg.append(layer);
+    svg.append(mk("rect", { class: "hit", x: PL, y: PT, width: xR - PL, height: H - PT - PB, fill: "transparent" }));
+    hover = { pts, x, y, yMax, layer };
+  }
+
+  function showReadout(evt) {
+    if (!hover) return;
+    const r = svg.getBoundingClientRect();
+    const sx = (evt.clientX - r.left) / r.width * W;
+    const t = START + (sx - PL) / (W - PL - PR) * YEARS;
+    if (t < START || t > START + YEARS) return hideReadout();
+    const i = Math.round((t - START) / DT);
+    const [pt, pv] = hover.pts[Math.max(0, Math.min(i, hover.pts.length - 1))];
+    const px = hover.x(pt), py = hover.y(Math.min(pv, hover.yMax));
+    const L = hover.layer;
+    L.querySelector(".rl").setAttribute("x1", px); L.querySelector(".rl").setAttribute("x2", px);
+    const c = L.querySelector(".rc");
+    c.setAttribute("cx", px); c.setAttribute("cy", py);
+    c.setAttribute("visibility", pv <= hover.yMax ? "visible" : "hidden");
+    const fmt = v => v < 10 ? String(+v.toFixed(1)) : String(Math.round(v));
+    const elapsed = pt - START;
+    const label = (pv >= 100 ? "100+" : fmt(pv)) + " years of progress in " + fmt(elapsed) + (fmt(elapsed) === "1" ? " year" : " years");
+    const txt = L.querySelector(".rt");
+    txt.textContent = label;
+    const w = label.length * 6.4 + 16;
+    const bx = px + 10 + w > W - PR ? px - 10 - w : px + 10;
+    const by = Math.max(PT, Math.min(py - 30, H - PB - 26));
+    const b = L.querySelector(".rb");
+    b.setAttribute("x", bx); b.setAttribute("y", by); b.setAttribute("width", w);
+    txt.setAttribute("x", bx + 8); txt.setAttribute("y", by + 15);
+    L.setAttribute("visibility", "visible");
+  }
+  function hideReadout() { if (hover) hover.layer.setAttribute("visibility", "hidden"); }
+  svg.addEventListener("pointermove", showReadout);
+  svg.addEventListener("pointerleave", hideReadout);
+
+  function update() {
+    $("cap-v").textContent = state.cap + "%";
+    $("cap-h").textContent = state.cap >= 100
+      ? "Nothing is left for humans, so nothing caps research speed"
+      : "Humans do the rest, so research can go at most " + Math.round(100 / (100 - state.cap)) + "× faster";
+    $("cap-h").title = "Starts at today's " + Math.round(state.f0) + "%. Tasks AI can't do stay at human speed and set the speed limit.";
+    const months = m => m >= 11.5 ? (m / 12).toFixed(m % 12 ? 1 : 0).replace(/\.0$/, "") + (m >= 18 ? " years" : " year") : Math.max(1, Math.round(m)) + (Math.round(m) <= 1 ? " month" : " months");
+    const late = k => {
+      const v = Math.exp(Math.log(state.cNow) * B("compute").options[k][0]);
+      return (v < 10 ? +v.toFixed(1) : Math.round(v)) + "×/yr";
+    };
+    B("compute").hint = {
+      none: "Growth stays at " + late("none") + " after 2030; experiments never limit research",
+      low: "Growth slows to " + late("low") + " after 2030; experiments limit research a little",
+      medium: "Growth slows to " + late("medium") + " after 2030; experiments limit research",
+      high: "Growth slows to " + late("high") + " after 2030; experiments cap research speed",
+    };
+    B("lag").hint = {
+      none: "Stays at " + months(state.lag0 * 12),
+      some: "Can fall to " + months(state.lag0 * 12 / 3),
+      "a lot": "Can fall to " + months(state.lag0 * 12 / 12),
+    };
+    for (const p of BELIEFS) if (!p.slider) $(p.id + "-h").textContent = p.hint[state[p.id]];
+    draw(simulate(state));
+    postSettings();
+  }
+  const presetBox = $("presets");
+  for (const name of Object.keys(PRESETS)) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = name;
+    btn.dataset.k = name;
+    btn.setAttribute("aria-pressed", String(name === DEFAULT_PRESET));
+    btn.addEventListener("click", () => {
+      const vals = PRESETS[name];
+      for (const id in vals) setters[id](vals[id]);
+      syncCap();
+      markPreset(name);
+      update();
+    });
+    presetBox.append(btn);
+  }
+  function markPreset(name) {
+    presetBox.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.k === name)));
+    const desc = $("scenario-desc");
+    desc.textContent = name ? PRESET_DESC[name] : "";
+    desc.hidden = !name;
+  }
+
+  // Sharing: settings can come from the page URL, and "Copy link" builds a URL that reproduces them
+  const SHARE_URL = "https://carlakc.me/writing/recursive-self-improvement/";
+  const PARAMS = {
+    f0: "automated", sNow: "software", cNow: "compute-growth", lag0: "lag",
+    boost: "boost", cap: "cap", lag: "lag-shrink", hw: "hardware",
+    data: "data", compute: "compute", r: "innovation", limits: "limits",
+  };
+  const DEFAULTS = Object.fromEntries(Object.keys(PARAMS).map(id => [id, state[id]]));
+  function applyParams(search) {
+    const q = new URLSearchParams(search);
+    let changed = false;
+    for (const [id, key] of Object.entries(PARAMS)) {
+      if (!q.has(key)) continue;
+      const raw = q.get(key);
+      const start = STARTING.find(x => x.id === id);
+      if (start || id === "cap") {
+        const v = parseFloat(raw);
+        if (!Number.isFinite(v)) continue;
+        if (start) { state[id] = Math.min(start.max, Math.max(start.min, v)); $(id).value = state[id]; }
+        else setters.cap(Math.min(100, Math.max(0, Math.round(v))));
+      } else if (Object.prototype.hasOwnProperty.call(B(id).options, raw)) {
+        setters[id](raw);
+      } else continue;
+      changed = true;
+    }
+    if (!changed) return;
+    syncCap();   // keeps the cap at or above today's automation
+    const match = Object.keys(PRESETS).find(n => Object.entries(PRESETS[n]).every(([id, v]) => state[id] === v));
+    markPreset(match ?? null);
+  }
+  function settingsQuery() {
+    const q = new URLSearchParams();
+    for (const [id, key] of Object.entries(PARAMS)) if (state[id] !== DEFAULTS[id]) q.set(key, state[id]);
+    return q.toString();
+  }
+  // The blog post shows its own "Share your intuition" link, so it needs the current settings
+  function postSettings() {
+    if (window.parent !== window) window.parent.postMessage({ type: "model-settings", query: settingsQuery() }, "*");
+  }
+  function shareLink() {
+    let base = SHARE_URL;
+    try {
+      // Embedded in the blog post: link to the page the reader is on (works locally too)
+      const top = window.parent !== window ? window.parent.location : null;
+      if (top && top.pathname.startsWith("/writing/")) base = top.origin + top.pathname;
+    } catch (e) { /* embedded somewhere else, such as claude.ai: link to the published post */ }
+    const qs = settingsQuery();
+    return base + (qs ? "?" + qs : "") + "#back-of-envelope";
+  }
+  let statusTimer = null;
+  $("share-btn").addEventListener("click", () => {
+    const url = shareLink();
+    const status = $("share-status"), box = $("share-url");
+    const say = msg => { status.textContent = msg; clearTimeout(statusTimer); statusTimer = setTimeout(() => { status.textContent = ""; }, 3000); };
+    const fallback = () => { box.hidden = false; box.value = url; box.focus(); box.select(); say("Copy the link below"); };
+    try {
+      navigator.clipboard.writeText(url).then(() => { box.hidden = true; say("Link copied"); }, fallback);
+    } catch (e) { fallback(); }
+  });
+
+  markPreset(DEFAULT_PRESET);
+  applyParams(location.search);
+  syncCap();
+  update();
+
+  // Embedded in the blog post: tell the parent page how tall we are
+  if (window.parent !== window) {
+    document.documentElement.classList.add("embedded");
+    const post = () => window.parent.postMessage({ type: "embed-height", height: Math.ceil(document.documentElement.getBoundingClientRect().height) }, location.origin);
+    new ResizeObserver(post).observe(document.documentElement);
+    post();
+  }
+})();
+</script>
+</body>
+</html>
