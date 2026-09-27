@@ -234,6 +234,11 @@ Expert opinions aren’t ground truth either. People have different models of ho
 
 The chart below gives a sample of those views, ranging from relatively skeptical to much faster takeoff scenarios.
 
+<figure class="expert-timelines">
+  <iframe data-autosize src="/writing/recursive-self-improvement/expert-timelines.html" title="Expert views on when AI research may be automated, and whether it leads to a takeoff" loading="lazy" style="display:block;width:100%;height:640px;border:0;"></iframe>
+  <figcaption>Sources are estimating different milestones and should not be read as directly comparable predictions. Dates and ranges are shown to give a sense of the spread of current views. Hover over or tap a row for details.</figcaption>
+</figure>
+
 ## Conclusion
 
 I am almost certainly about to be wrong on the internet. [My current intuition](https://carlakc.me/writing/recursive-self-improvement/?boost=high&cap=99&hardware=medium&data=low#back-of-envelope) is that AI will become extremely useful for performing and speeding up research, but that data, compute and the messy realities of doing good research will create bottlenecks along the way. I’m not expecting an exponential takeoff. But I am expecting progress to be very, very fast.

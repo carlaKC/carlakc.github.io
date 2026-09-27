@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Expert Views on AI Research Automation</title>
+<style>
+  @font-face {
+    font-family: "Manrope";
+    src: url("/fonts/manrope-variable.woff2") format("woff2-variations");
+    font-weight: 200 800;
+    font-style: normal;
+    font-display: swap;
+  }
+  /* Same tokens as the post (theme.css) and the RSI model */
+  :root {
+    color-scheme: light;
+    --paper: #efe6d5;
+    --paper-2: #e4d8c0;
+    --terracotta: #b04a32;
+    --terracotta-ink: #963f2b;
+    --blue: #7e97a4;
+    --ink: #2a2521;
+    --muted: #6a6155;
+    --hairline: rgba(42, 37, 33, 0.13);
+    --hairline-strong: rgba(42, 37, 33, 0.24);
+    --sea: #253b55;
+    --font: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); }
+  body {
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { position: relative; padding-bottom: 0.25rem; }
+
+  /* The chart keeps its proportions; on narrow screens it scrolls sideways */
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  svg { display: block; width: 100%; min-width: 720px; height: auto; }
+  svg text { font-family: var(--font); fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  svg .region { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+  svg .source { font-size: 13.5px; font-weight: 500; fill: var(--terracotta-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+  svg a:hover .source, svg a:focus .source { fill: var(--terracotta); }
+  svg .claim { font-size: 11.5px; fill: var(--muted); }
+  svg .row-hit { fill: transparent; cursor: pointer; }
+  svg .row.active .row-bg { fill: rgba(126, 151, 164, 0.14); }
+  svg a:focus { outline: none; }
+  svg a:focus-visible .source { outline: 2px solid var(--terracotta); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;                 /* one line in the post column; wraps only on narrow screens */
+    gap: 0.4rem 1.1rem;
+    margin-top: 0.6rem;
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
+  .legend svg { width: 22px; min-width: 0; height: 14px; display: inline-block; }
+
+  .tip {
+    position: absolute;
+    z-index: 2;
+    width: 19rem;
+    max-width: calc(100% - 8px);
+    padding: 0.7rem 0.85rem 0.75rem;
+    background: var(--paper);
+    border: 1px solid var(--hairline-strong);
+    border-radius: 3px;
+    box-shadow: 0 6px 18px rgba(42, 37, 33, 0.08);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    pointer-events: none;                 /* hovering never blocks the rows underneath */
+  }
+  .tip[hidden] { display: none; }
+  .tip .t-source { font-weight: 600; color: var(--ink); }
+  .tip .t-aff { color: var(--muted); }
+  .tip .t-kind {
+    display: inline-block;
+    margin: 0.35rem 0 0.3rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sea);
+  }
+  .tip p { margin: 0 0 0.3rem; color: var(--ink); }
+  .tip p:last-child { margin-bottom: 0; }
+  .tip strong { font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="scroll"><svg id="chart" role="img" aria-label="Expert views on when AI research may be automated, and whether it leads to a takeoff"></svg></div>
+  <div class="legend" id="legend"></div>
+  <div class="tip" id="tip" role="tooltip" hidden></div>
+</div>
+
+<script>
+(function () {
+  // Each source has one or more marks on the calendar-year axis.
+  // Mark kinds: target | point | range | conditional | chain (point -> open point) |
+  //             note (no date) | sceptic (plateau glyph) | sceptic-range | uncertain
+  const SOURCES = [
+    {
+      name: "OpenAI", aff: "OpenAI, “Research acceleration”",
+      url: "https://openai.com/index/research-acceleration-view-inside-openai/",
+      estimating: "Automated AI researcher",
+      type: "Organizational target",
+      claim: "A March 2028 target for an automated AI researcher, working under human supervision. OpenAI says it has already reached an “automated research intern”.",
+      marks: [{ kind: "target", at: 2028.2, label: "Automated AI researcher target (Mar 2028)" }],
+    },
+    {
+      name: "Dario Amodei", aff: "Anthropic, “The Adolescence of Technology”",
+      url: "https://darioamodei.com/essay/the-adolescence-of-technology",
+      estimating: "AI autonomously improving AI",
+      type: "Personal forecast, explicitly uncertain",
+      claim: "Roughly 1–2 years until one AI generation can autonomously build the next. Plotted from the essay’s early-2026 publication.",
+      marks: [{ kind: "range", from: 2027, to: 2028.99, label: "One AI generation builds the next" }],
+    },
+    {
+      name: "John Schulman", aff: "Dwarkesh Podcast debate with Beren Millidge and Charlie O’Neill",
+      url: "https://www.dwarkesh.com/p/john-beren-charlie",
+      estimating: "10× AI-research productivity",
+      type: "Personal forecast",
+      claim: "About 2 years to 10× AI-research productivity. Beren Millidge finds this plausible. Dates assume the debate was recorded in mid-2026.",
+      marks: [{ kind: "point", at: 2028.5, label: "10× AI research productivity" }],
+    },
+    {
+      name: "Charlie O’Neill", aff: "Dwarkesh Podcast debate with John Schulman and Beren Millidge",
+      url: "https://www.dwarkesh.com/p/john-beren-charlie",
+      estimating: "10× AI-research productivity",
+      type: "Personal forecast",
+      claim: "About 5–10 years to 10× AI-research productivity, with research judgment as an important bottleneck. Dates assume the debate was recorded in mid-2026.",
+      marks: [{ kind: "range", from: 2031.5, to: 2036.5, label: "10× AI research productivity" }],
+    },
+    {
+      name: "METR", aff: "METR, “A simpler AI timelines model”",
+      url: "https://metr.org/notes/2026-02-10-simpler-ai-timelines-model/",
+      estimating: "Near-total AI R&D automation",
+      type: "Model output",
+      claim: "Median of late 2032 for more than 99% AI R&D automation. Many simulations still produce 300–3,000× research output by 2035 without the fastest takeoff assumptions.",
+      marks: [{ kind: "point", at: 2032.8, label: ">99% AI R&D automation (median)" }],
+    },
+    {
+      name: "AI Futures Model", aff: "Daniel Kokotajlo’s August 2026 forecast",
+      url: "https://www.aifuturesmodel.com/forecast/daniel-08-16-26?breakout=1&show=model&takeoff=ASI%2CTED-AI",
+      estimating: "Automated coding, then superintelligence",
+      type: "Model output",
+      claim: "Automated coder median December 2027, then a median of 1.9 years from automated coder to ASI, with a huge range from months to decades.",
+      marks: [{ kind: "chain", at: 2027.95, to: 2029.85, label: "Automated coder (Dec 2027) → ASI (median +1.9 yrs)" }],
+    },
+    {
+      name: "Forethought", aff: "Forethought, “How quick and big would a software intelligence explosion be?”",
+      url: "https://www.forethought.org/research/how-quick-and-big-would-a-software-intelligence-explosion-be",
+      estimating: "Takeoff after full AI R&D automation",
+      type: "Conditional estimate",
+      claim: "About a 60% chance that more than 3 years of normal AI progress is compressed into under 1 year, and about 20% for more than 10 years. Their central view is substantial acceleration, not necessarily an instant explosion.",
+      marks: [{ kind: "note", label: "If fully automated: 60% chance of >3 years of progress in <1 year" }],
+    },
+    {
+      name: "Ajeya Cotra", aff: "Planned Obsolescence, “Takeoff speeds rule everything around me”",
+      url: "https://www.planned-obsolescence.org/p/takeoff-speeds-rule-everything-around",
+      estimating: "A range of takeoff views",
+      type: "Illustrative scenarios",
+      claim: "Uses full cognitive automation in 2028 as an illustrative starting point. A fast view reaches radically superhuman AI in months; a slower view takes years and needs physical automation too; a skeptical view has little or no takeoff.",
+      marks: [{ kind: "conditional", at: 2028.5, label: "Illustrative 2028 start: takeoff in months, years, or not at all" }],
+    },
+    {
+      name: "Tom Reed", aff: "80,000 Hours podcast, “The Goodhart Singularity”",
+      url: "https://80000hours.org/podcast/episodes/the-goodhart-singularity/",
+      estimating: "Whether automated AI R&D leads to broad superintelligence",
+      type: "Skeptical view",
+      claim: "Skeptical of a fast, general self-improvement loop. Progress may be bottlenecked by useful real-world learning signal, so rapid improvement inside a data centre may not generalize across domains.",
+      marks: [{ kind: "sceptic", label: "Skeptical: bottlenecked by real-world learning signal" }],
+    },
+    {
+      name: "Dwarkesh Patel", aff: "Dwarkesh Podcast, “Thoughts on AI progress”",
+      url: "https://www.dwarkesh.com/p/thoughts-on-ai-progress-dec-2025",
+      estimating: "How quickly breakthroughs turn into runaway progress",
+      type: "Skeptical view",
+      claim: "Skeptical that the first breakthrough in abilities like continual learning produces immediate takeoff. These capabilities may improve gradually over another 5–10 years. Plotted from the post’s December 2025 date.",
+      marks: [{ kind: "sceptic-range", from: 2030.95, to: 2035.95, label: "Skeptical: gradual improvement over 5–10 years" }],
+    },
+  ];
+
+  // Layout
+  const W = 960, NAME_W = 175, ROW_H = 50, TOP = 64, BOTTOM = 34;
+  const A0 = NAME_W + 16, A1 = W - 12;        // calendar years
+  const Y_FROM = 2026.5, Y_TO = 2037.05;
+  const H = TOP + SOURCES.length * ROW_H + BOTTOM;
+  const xa = v => A0 + (v - Y_FROM) / (Y_TO - Y_FROM) * (A1 - A0);
+  const rowY = i => TOP + i * ROW_H + ROW_H / 2;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("chart");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const mk = (tag, attrs, text, parent = svg) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    parent.append(n);
+    return n;
+  };
+
+  mk("text", { x: A0, y: 16, class: "region" }, "When is AI research automated, and does it take off?");
+
+  // Axis: calendar years
+  const axisY = TOP - 14;
+  for (let yr = 2027; yr <= 2036; yr++) {
+    mk("line", { x1: xa(yr), x2: xa(yr), y1: TOP - 4, y2: H - BOTTOM, stroke: "var(--hairline)", "stroke-width": 1 });
+    mk("text", { x: xa(yr + 0.5), y: axisY, "text-anchor": "middle" }, String(yr));   // label sits in the middle of its year
+  }
+  mk("line", { x1: xa(2037), x2: xa(2037), y1: TOP - 4, y2: H - BOTTOM, stroke: "var(--hairline)", "stroke-width": 1 });
+  mk("text", { x: A1, y: H - 10, "text-anchor": "end" }, "Calendar year");
+  const now = 2026.75;
+  mk("line", { x1: xa(now), x2: xa(now), y1: TOP - 4, y2: H - BOTTOM, stroke: "var(--blue)", "stroke-width": 1, "stroke-dasharray": "3 3" });
+  mk("text", { x: xa(now) + 4, y: H - BOTTOM + 14, fill: "var(--blue)" }, "Now");
+
+  // Marker shapes
+  const SEA = "var(--sea)", MUTED = "var(--muted)";
+  function circle(g, x, y, solid) {
+    mk("circle", { cx: x, cy: y, r: 5.5, fill: solid ? SEA : "var(--paper)", stroke: SEA, "stroke-width": 1.5, "stroke-dasharray": solid ? "" : "2 2" }, null, g);
+  }
+  function diamond(g, x, y) {
+    mk("path", { d: `M${x},${y - 7} L${x + 7},${y} L${x},${y + 7} L${x - 7},${y} Z`, fill: SEA }, null, g);
+  }
+  function band(g, x0, x1, y, color, opacity) {
+    mk("rect", { x: x0, y: y - 5, width: Math.max(2, x1 - x0), height: 10, rx: 2, fill: color, "fill-opacity": opacity }, null, g);
+    const edge = color === MUTED ? MUTED : SEA;
+    mk("line", { x1: x0, x2: x0, y1: y - 6, y2: y + 6, stroke: edge, "stroke-width": 1.5 }, null, g);
+    mk("line", { x1: x1, x2: x1, y1: y - 6, y2: y + 6, stroke: edge, "stroke-width": 1.5 }, null, g);
+  }
+  // Plateau glyph: progress that rises, then levels off
+  function plateau(g, x, y) {
+    mk("path", { d: `M${x - 9},${y + 5} Q${x - 3},${y - 5} ${x + 3},${y - 4} L${x + 10},${y - 4}`, fill: "none", stroke: MUTED, "stroke-width": 1.75, "stroke-linecap": "round" }, null, g);
+  }
+  function question(g, x, y) {
+    mk("circle", { cx: x, cy: y, r: 7.5, fill: "none", stroke: MUTED, "stroke-width": 1, "stroke-dasharray": "2 2" }, null, g);
+    mk("text", { x, y: y + 4, "text-anchor": "middle", "font-size": 11, "font-weight": 600 }, "?", g);
+  }
+  // Label under a marker, kept inside the plot
+  function label(g, x, y, text, italic) {
+    const t = mk("text", { x, y: y + 19, class: "claim" }, text, g);
+    if (italic) t.setAttribute("font-style", "italic");
+    const w = t.getComputedTextLength();
+    t.setAttribute("x", Math.max(A0, Math.min(x - 6, A1 - w)));
+  }
+
+  const UNDATED_X = xa(2027.35);   // where undated marks sit, clear of the "Now" line
+  function drawMark(g, m, y) {
+    switch (m.kind) {
+      case "target": diamond(g, xa(m.at), y); label(g, xa(m.at), y, m.label); break;
+      case "point": circle(g, xa(m.at), y, true); label(g, xa(m.at), y, m.label); break;
+      case "conditional": circle(g, xa(m.at), y, false); label(g, xa(m.at), y, m.label); break;
+      case "range": band(g, xa(m.from), xa(m.to), y, "var(--blue)", 0.55); label(g, xa(m.from), y, m.label); break;
+      case "chain":
+        mk("line", { x1: xa(m.at), x2: xa(m.to) - 6, y1: y, y2: y, stroke: SEA, "stroke-width": 1.5, "stroke-dasharray": "4 3" }, null, g);
+        circle(g, xa(m.at), y, true);
+        mk("circle", { cx: xa(m.to), cy: y, r: 5.5, fill: "var(--paper)", stroke: SEA, "stroke-width": 1.5 }, null, g);
+        label(g, xa(m.at), y, m.label);
+        break;
+      case "note":
+        circle(g, UNDATED_X, y, false);
+        label(g, UNDATED_X, y, m.label, true);
+        break;
+      case "sceptic": plateau(g, UNDATED_X, y); label(g, UNDATED_X, y, m.label, true); break;
+      case "sceptic-range": band(g, xa(m.from), xa(m.to), y, MUTED, 0.18); label(g, xa(m.from), y, m.label, true); break;
+      case "uncertain": question(g, UNDATED_X, y); label(g, UNDATED_X, y, m.label, true); break;
+    }
+  }
+
+  // Rows
+  const rows = [];
+  SOURCES.forEach((s, i) => {
+    const y = rowY(i) - 6;
+    const g = mk("g", { class: "row" });
+    mk("rect", { class: "row-bg", x: 0, y: rowY(i) - ROW_H / 2, width: W, height: ROW_H, fill: "transparent" }, null, g);
+    if (i > 0) mk("line", { x1: 0, x2: W, y1: rowY(i) - ROW_H / 2, y2: rowY(i) - ROW_H / 2, stroke: "var(--hairline)", "stroke-width": 1 }, null, g);
+    const link = mk("a", { href: s.url, target: "_blank", rel: "noopener" }, null, g);
+    mk("text", { x: 0, y: y + 5, class: "source" }, s.name + " ↗", link);
+    s.marks.forEach(m => drawMark(g, m, y));
+    const hit = mk("rect", { class: "row-hit", x: NAME_W, y: rowY(i) - ROW_H / 2, width: W - NAME_W, height: ROW_H, tabindex: 0, role: "button", "aria-label": `Details for ${s.name}` }, null, g);
+    rows.push({ g, hit, s, i });
+  });
+
+  // Legend
+  const legend = document.getElementById("legend");
+  const key = (svgInner, text) => {
+    const span = document.createElement("span");
+    span.innerHTML = `<svg viewBox="0 0 22 14" aria-hidden="true">${svgInner}</svg>${text}`;
+    legend.append(span);
+  };
+  key('<circle cx="11" cy="7" r="5" fill="#253b55"/>', "Point estimate");
+  key('<rect x="1" y="2" width="20" height="10" rx="2" fill="#7e97a4" fill-opacity="0.55"/><line x1="1.5" x2="1.5" y1="1" y2="13" stroke="#253b55" stroke-width="1.5"/><line x1="20.5" x2="20.5" y1="1" y2="13" stroke="#253b55" stroke-width="1.5"/>', "Range");
+  key('<path d="M11,0 L18,7 L11,14 L4,7 Z" fill="#253b55"/>', "Organizational target");
+  key('<circle cx="11" cy="7" r="5" fill="none" stroke="#253b55" stroke-width="1.5" stroke-dasharray="2 2"/>', "Conditional or illustrative");
+  key('<path d="M2,12 Q8,2 14,3 L21,3" fill="none" stroke="#6a6155" stroke-width="1.75" stroke-linecap="round"/>', "Skeptical of fast takeoff");
+
+  // Tooltip: hover on desktop, tap or keyboard elsewhere
+  const tip = document.getElementById("tip");
+  const wrap = document.getElementById("wrap");
+  let pinned = null, current = null;
+  function fill(r) {
+    const s = r.s;
+    tip.innerHTML =
+      `<div class="t-source">${s.name}</div><div class="t-aff">${s.aff}</div>` +
+      `<div class="t-kind">${s.type}</div><p><strong>Estimating:</strong> ${s.estimating}</p><p>${s.claim}</p>`;
+  }
+  // Place the tooltip near the pointer (or the row), always at full width and inside the frame
+  function place(r, clientX) {
+    const wr = wrap.getBoundingClientRect(), hr = r.hit.getBoundingClientRect();
+    tip.style.left = "0px";
+    tip.style.top = "0px";
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    const px = (clientX ?? hr.left + hr.width * 0.3) - wr.left;
+    const left = Math.max(0, Math.min(wr.width - tw, px + 14));
+    let top = hr.bottom - wr.top + 6;
+    if (top + th > wr.height) top = Math.max(0, hr.top - wr.top - th - 6);
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
+  }
+  function show(r, clientX) {
+    rows.forEach(x => x.g.classList.toggle("active", x === r));
+    if (current !== r) { fill(r); current = r; }
+    tip.hidden = false;
+    place(r, clientX);
+  }
+  function hide() {
+    tip.hidden = true;
+    current = null;
+    rows.forEach(x => x.g.classList.remove("active"));
+  }
+  rows.forEach(r => {
+    r.hit.addEventListener("pointermove", e => { if (e.pointerType === "mouse" && !pinned) show(r, e.clientX); });
+    r.hit.addEventListener("pointerleave", e => { if (e.pointerType === "mouse" && !pinned) hide(); });
+    r.hit.addEventListener("click", e => {
+      pinned = pinned === r ? null : r;
+      pinned ? show(r, e.clientX) : hide();
+    });
+    r.hit.addEventListener("focus", () => { if (!pinned) show(r); });
+    r.hit.addEventListener("blur", () => { if (!pinned) hide(); });
+    r.hit.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pinned = pinned === r ? null : r; pinned ? show(r) : hide(); }
+      if (e.key === "Escape") { pinned = null; hide(); }
+    });
+  });
+  document.addEventListener("click", e => { if (pinned && !e.target.closest(".row-hit, .tip")) { pinned = null; hide(); } });
+
+  // Embedded in the blog post: tell the parent page how tall we are
+  if (window.parent !== window) {
+    const post = () => window.parent.postMessage({ type: "embed-height", height: Math.ceil(document.documentElement.getBoundingClientRect().height) }, location.origin);
+    new ResizeObserver(post).observe(document.documentElement);
+    post();
+  }
+})();
+</script>
+</body>
+</html>
