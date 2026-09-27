@@ -6,10 +6,19 @@ import Footer from '../components/Footer.astro';
 interface Props {
   title?: string;
   description?: string;
+  /** Wider reading column (long-form posts). */
+  wide?: boolean;
+  /** Fixed background artwork (path under public/). */
+  background?: string;
+  /** Ask search engines not to index this page. */
+  noindex?: boolean;
 }
 const {
   title = 'Carla Kirk-Cohen',
   description = 'Carla Kirk-Cohen — Bitcoin & Lightning Network protocol development.',
+  wide = false,
+  background = '/background.webp',
+  noindex = false,
 } = Astro.props;
 ---
 <!doctype html>
@@ -22,6 +31,7 @@ const {
     </script>
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href="data:," />
     <link
       rel="preload"
@@ -30,11 +40,11 @@ const {
       type="font/woff2"
       crossorigin
     />
-    <link rel="preload" href="/background.webp" as="image" type="image/webp" />
+    <link rel="preload" href={background} as="image" type="image/webp" />
   </head>
-  <body>
+  <body class:list={{ wide }}>
     <!-- Fixed artwork background — static as the content scrolls over it. -->
-    <div class="page-bg" aria-hidden="true"></div>
+    <div class="page-bg" style={`background-image: url("${background}")`} aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
 
     <Nav />

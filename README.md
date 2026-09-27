@@ -22,7 +22,8 @@ Requires Node ≥22.12 (Astro 7).
   `src/data/working-on.json` (each project supports an optional title `url` and a
   `blurb` array whose entries are plain strings or `{ "text", "url" }` inline links).
 - **Writing**: self-hosted posts are Markdown in `src/content/writing/` (copy the
-  pattern, set `draft: false`). Externally-hosted / Delving Bitcoin links live in
+  pattern, set `draft: false`). Add `unlisted: true` to deploy a post at its URL
+  for review without listing it on the home page (it's also marked noindex). Externally-hosted / Delving Bitcoin links live in
   `src/data/writing-links.json`.
 - **Appearances**: edit `src/data/appearances.json` (rendered most-recent first).
 - **Socials**: `src/components/Footer.astro`.
@@ -32,6 +33,7 @@ Requires Node ≥22.12 (Astro 7).
 - **Theme / layout**: `src/styles/theme.css` (palette, Manrope `@font-face`, paper
   grain, the parchment sheet, reveal-on-scroll).
 - **Background artwork**: `public/background.webp` — a fixed, full-bleed layer set
-  in `.page-bg`. Optimized from PNG with `cwebp`.
+  in `.page-bg`. Optimized from PNG with `cwebp`. Blog posts use
+  `public/blog-background.webp` instead (set via `Base.astro`'s `background` prop).
 - **Font**: Manrope, self-hosted at `public/fonts/manrope-variable.woff2` (OFL).
 - **Header / footer**: `src/components/Nav.astro`, `src/components/Footer.astro`.

@@ -9,6 +9,9 @@ const writing = defineCollection({
     description: z.string().optional(),
     tags: z.array(z.string()).optional(),
     draft: z.boolean().default(false),
+    // Published at its URL (e.g. for review) but not listed on the home page
+    // and marked noindex.
+    unlisted: z.boolean().default(false),
   }),
 });
 

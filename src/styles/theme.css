@@ -47,13 +47,13 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* ---- fixed artwork background — static while content scrolls over it ---- */
+/* ---- fixed artwork background — static while content scrolls over it.
+   The image itself is set per page by Base.astro's `background` prop. ---- */
 .page-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
   background-color: var(--paper);
-  background-image: url("/background.webp");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -88,6 +88,11 @@ main,
   right: 0;
   z-index: 3;
 }
+
+/* long-form posts get a much wider column (header, sheet and footer all
+   follow). Edge-to-edge on phones like the home page, a margin of artwork on
+   tablets/laptops, and capped on wide monitors so lines stay ~80 characters. */
+body.wide { --measure: min(100% - 2 * clamp(0rem, 5vw - 1.25rem, 3rem), 60rem); }
 
 /* centered reading column, reused by header / sections / footer */
 .wrap {
