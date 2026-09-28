@@ -14,7 +14,7 @@ Unlike a human researcher, who needs to be born and educated and eat and sleep, 
 
 Nobody knows if or when we’ll achieve recursive self-improvement, or how fast takeoff could be if we do. There is a wide range of possible trajectories, including one where progress looks much like it does today or halts entirely due to external shocks. This is an important question in deciding how worried to be about AI, because the speed at which models improve affects both the technological and societal risks we face and how much time we have to respond to them.
 
-This is one of the biggest questions of our time, so it’s certainly not going to be resolved in my dinky little blog post. This is a high level attempt to build some intuition around the topic, which I hope could be helpful for others trying to do the same.
+This is one of the biggest questions of our time, so it warrants far more thorough investigation than this post will provide. What I hope it does provide is some scaffolding for building intuition around the topic, which can then be updated as we learn more and compared against the views of people who have studied it in much greater depth.
 
 To do so I’ll take a look at the following questions:
 
@@ -96,7 +96,7 @@ This evaluation runs into the same issue I mentioned above: it measures well-def
 
 **Where do you think research capabilities are today?**
 
-The information that’s publicly available doesn’t paint a compelling picture of models being particularly good at autonomously performing research. I’d certainly believe that they’re a great multiplying factor when paired with a competent human researcher, but don’t see much compelling evidence that they'd be able to perform quality research on their own.
+The information that’s publicly available doesn’t paint a compelling picture of models being particularly good at autonomously performing research. I certainly believe that they’re a great multiplying factor when paired with a competent human researcher, but I don’t yet see strong evidence that they could perform high-quality research on their own.
 
 </aside>
 
@@ -150,13 +150,13 @@ We could also try to teach these harder-to-capture parts of research through rei
 
 **Can we continue to provide valuable training signals for training?**
 
-It seems likely to me that we’ll run into data bottlenecks, even if we can pick some low-hanging fruit by using pretraining data more efficiently or generating synthetic data. I’m particularly skeptical that synthetic data will produce much genuinely new information in research, where a lot of the useful judgement isn’t well written down. Many of the hardest things humans do aren’t. I’ve read Obama’s biography, but I certainly don’t know how to be president. It seems more plausible that reinforcement learning could help models make better use of the knowledge they already have and improve at parts of the research process. But creating good training environments for open-ended research seems expensive and difficult, and I think that could become a meaningful bottleneck. Labs have massive amounts of research to pour into this, and I’d expect our success here to be a key determinant of how we progress.
+It seems likely to me that we’ll run into data bottlenecks, even if we can pick some low-hanging fruit by using pretraining data more efficiently or generating synthetic data. I’m particularly skeptical that synthetic data will produce much genuinely new information in research, where a lot of the useful judgement isn’t well written down. I’ve read Obama’s biography, but I certainly don’t know how to be president. It seems more plausible that reinforcement learning could help models make better use of the knowledge they already have and improve at parts of the research process. But creating good training environments for open-ended research seems expensive and difficult, and I think that could become a meaningful bottleneck. I certainly expect labs to pour resources into this problem, but suspect progress will still be limited by the human speed at which we can build and verify useful training environments.
 
 </aside>
 
 ### A note on Algorithms
 
-(be warned: this section will likely make a machine learning researcher vomit)
+(A warning for ML researchers: what follows is intentionally simplified)
 
 Improvements to the algorithms we use to train models can [decrease the amount of compute](https://epoch.ai/gradient-updates/the-least-understood-driver-of-ai-progress) needed to reach the same level of performance, which means we can train more capable models on the same hardware. It’s [difficult to decouple](https://epoch.ai/publications/algorithmic-progress-in-language-models) these gains from improvements in data and increased scale because all of these tend to change together. Available [estimates](https://epoch.ai/gradient-updates/the-least-understood-driver-of-ai-progress#appendix-estimates-of-software-progress) have a very large margin for error, but suggest that improvements to AI software may be equivalent to several-fold more effective compute each year.
 
@@ -228,9 +228,9 @@ To interact with the model, you can choose a reasonable starting state based on 
 
 ## Expert Projections
 
-Trying to work out when AI research will be automated, and what happens afterwards, is really a modelling problem that could easily be a full-time job. The best I can reasonably do here is build some intuition from the evidence above, then compare that intuition against people who have spent much more time thinking about it.
+It’s difficult to form your own opinion here. The types of problems you use AI for will bias your view of how it’s progressing, and investigating the many moving parts in RSI requires more time than most people have. Expert opinions can therefore be useful as another input, helping to anchor your intuition against people who have spent much more time studying the question.
 
-Expert opinions aren’t ground truth either. People have different models of how progress works, different access to frontier systems, and their own incentives and biases. I think the useful approach is to look across a range of informed views, understand why they differ, and combine them with your own reasoning rather than anchoring on any single forecast.
+These opinions aren’t ground truth either. People have different models of how progress works, different access to frontier systems, and their own incentives and biases. I think the useful approach is to look across a range of informed views, understand why they differ, and combine them with your own reasoning rather than relying on any single forecast.
 
 The chart below gives a sample of those views, ranging from relatively skeptical to much faster takeoff scenarios.
 
@@ -241,8 +241,8 @@ The chart below gives a sample of those views, ranging from relatively skeptical
 
 ## Conclusion
 
-I am almost certainly about to be wrong on the internet. [My current intuition](https://carlakc.me/writing/recursive-self-improvement/?boost=high&cap=99&hardware=medium&data=low#back-of-envelope) is that AI will become extremely useful for performing and speeding up research, but that data, compute and the messy realities of doing good research will create bottlenecks along the way. I’m not expecting an exponential takeoff. But I am expecting progress to be very, very fast.
+Predictions on AI timelines tend to [age like milk](https://xkcd.com/386/), so I expect to update these views as my understanding grows and new information comes in. [My current intuition](https://carlakc.me/writing/recursive-self-improvement/?boost=high&cap=99&hardware=medium&data=low#back-of-envelope) is that AI will become extremely useful for performing and speeding up research, but that data, compute and the messy realities of doing good research will create bottlenecks along the way. I’m not expecting an exponential takeoff. But I am expecting progress to be very, very fast.
 
-Which means there is work to be done. We need to harden codebases, infrastructure, and public and personal security against the already very capable cyber models we already have today. We need better ways to measure the “difficult to measure” capabilities of models so that we can actually understand what they can do. And we need to take seriously the possibility that AI starts accelerating AI research, even if we don’t assume that it ends in an intelligence explosion.
+Which means there is work to be done. We need better ways to measure the difficult-to-measure capabilities of models, particularly their ability to autonomously perform and accelerate AI research. We need labs to publish independently verifiable evidence about progress toward RSI. And we need to ensure that models emerging from this fast-moving cycle actually do what we want them to do, rather than literally or figuratively hacking their way to the easiest possible solution.
 
 [^agi]: A system that can perform at or above a competent human level across most cognitive tasks.
