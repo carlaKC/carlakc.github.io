@@ -578,10 +578,11 @@
       medium: "Growth slows to " + late("medium") + " after 2030; experiments limit research",
       high: "Growth slows to " + late("high") + " after 2030; experiments cap research speed",
     };
+    // Deployment lag: time to get a new, improved model to market
     B("lag").hint = {
-      none: "Stays at " + months(state.lag0 * 12),
-      some: "Can fall to " + months(state.lag0 * 12 / 3),
-      "a lot": "Can fall to " + months(state.lag0 * 12 / 12),
+      none: "Getting an improved model to market keeps taking " + months(state.lag0 * 12),
+      some: "Getting an improved model to market can speed up to " + months(state.lag0 * 12 / 3),
+      "a lot": "Getting an improved model to market can speed up to " + months(state.lag0 * 12 / 12),
     };
     for (const p of BELIEFS) if (!p.slider) $(p.id + "-h").textContent = p.hint[state[p.id]];
     draw(simulate(state));
