@@ -1,7 +1,6 @@
 ---
 title: Building Intuition for Recursive Self Improvement
-date: 2026-09-27
-unlisted: true
+date: 2026-10-02
 ---
 
 Everyone is talking about AI. It’s noisy and political and hyped and uncertain, which makes it difficult to form your own opinion in the sea of information out there.
