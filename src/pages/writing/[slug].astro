@@ -33,7 +33,7 @@ const minutes = Math.max(1, Math.round(words / 230 + images * 0.25 + interactive
     <div class="wrap">
       <p class="eyebrow">
         {post.data.draft && <span class="draft">Draft</span>}
-        Essay
+        Long post
       </p>
       <h1>{post.data.title}</h1>
       {post.data.description && <p class="byline">{post.data.description}</p>}
@@ -276,6 +276,14 @@ const minutes = Math.max(1, Math.round(words / 230 + images * 0.25 + interactive
       font-size: 0.72rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
+    }
+
+    /* acknowledgements: small, set apart from the end of the post */
+    .prose :global(.thanks) {
+      margin: 3rem 0 0;
+      font-size: 0.86rem;
+      line-height: 1.6;
+      color: var(--muted);
     }
 
     .post-end {

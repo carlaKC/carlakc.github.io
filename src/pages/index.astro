@@ -16,7 +16,7 @@ const writing = mergeWritingEntries(
 const talks = [...appearances].sort((a, b) => new Date(b.date) - new Date(a.date));
 
 const year = (d) => (d instanceof Date ? d : new Date(d)).getUTCFullYear();
-const sourceLabel = { post: 'Essay', delving: 'Delving Bitcoin', external: 'External' };
+const sourceLabel = { post: 'Long post', delving: 'Delving Bitcoin', external: 'External' };
 ---
 <Base>
   <section id="intro" class="intro reveal">
