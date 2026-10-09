@@ -12,17 +12,17 @@ One of the buzzwords at the heart of this discussion is **recursive self-improve
 
 Unlike a human researcher, who needs to be born and educated and eat and sleep, an AI researcher can work around the clock and be cheaply copied to create another equally capable researcher. Taken to the extreme, this creates the possibility of a feedback loop where better models build even better models, leading to exponential growth in model capabilities.
 
-Nobody knows if or when we’ll achieve recursive self-improvement, or how fast takeoff could be if we do. There is a wide range of possible trajectories, including one where progress looks much like it does today or halts entirely due to external shocks. This is an important question in deciding how worried to be about AI, because the speed at which models improve affects both the technological and societal risks we face and how much time we have to respond to them.
+Nobody knows if or when we’ll achieve recursive self-improvement, or how fast takeoff could be if we do. There is a wide range of possible trajectories, including one where progress looks much like it does today or halts entirely due to external shocks. This is an important question in deciding how worried to be about AI, because the speed at which models improve affects both the technological and societal benefits and risks we face and how much time we have to respond to them.
 
-This is one of the biggest questions of our time, so it warrants far more thorough investigation than this post will provide. What I hope it does provide is some scaffolding for building intuition around the topic, which can then be updated as we learn more and compared against the views of people who have studied it in much greater depth.
+This is one of the biggest questions of our time, so it warrants far more thorough investigation than this post will provide. What I’ll do here is break RSI down into three components:
 
-To do so I’ll take a look at the following questions:
+1. The capabilities models need to contribute meaningfully to AI research.
+2. The inputs that allow those capabilities to improve.
+3. The feedback loop where better research produces better models, which can then do better research.
 
-1. Where are model capabilities today relative to humans?
-2. How capable are models at AI research?
-3. What drives capability gains, and what could limit them?
-4. How much could AI research accelerate further progress?
-5. What estimates have experts made?
+I’ll then put these components into a highly simplified model to build some intuition for how the moving parts could interact, and compare the result against the views of people who have studied the topic in much greater depth.
+
+My aim isn’t to make a realistic prediction about whether or when we’ll see RSI, but to provide some scaffolding for building your own intuition around the topic, which can then be updated as we learn more.
 
 ## Capabilities Today
 
@@ -56,11 +56,17 @@ An important thing to note is that capability evaluations typically measure the 
 This isn’t quite [Goodhart’s law](https://en.wikipedia.org/wiki/Goodhart%27s_law). Models aren’t worse at basic arithmetic just because we can measure it. But it does mean our picture of model capabilities is incomplete. So take these evaluations as part of the evidence, but also pay attention to how models perform on some of the less defined tasks you ask them to complete.
 
 <aside class="decision">
-<p class="decision-label">Decision</p>
+<p class="decision-label">Question</p>
 
 **Where do you think capabilities are today?**
 
-I think that we are approaching, but have not reached, artificial general intelligence[^agi]. The above evals, along with gut feel using them, seems like a reasonable way to gauge progress.
+<p class="decision-label">Current view</p>
+
+I think that we are approaching, but have not reached, artificial general intelligence: a system that can perform at or above a competent human level across most cognitive tasks. The evals above, along with gut feel from using these systems, seem like a reasonable way to gauge progress.
+
+<p class="decision-label">What would change my mind</p>
+
+More impressive eval scores probably wouldn’t move me very much on their own. I’d be much more convinced if I felt that I could replace a competent coworker with a model in conversations about genuinely underspecified problems, where there isn’t much written down about the answer. In my own work, that includes reasoning about denial-of-service issues in private payment networks. I’d update further if coworkers working on similarly open-ended problems, like deciding what functionality to add to a protocol to reduce interactions, were having the same experience.
 
 </aside>
 
@@ -92,11 +98,17 @@ Another evaluation that’s relevant to the ability to perform research is [task
 This evaluation runs into the same issue I mentioned above: it measures well-defined software engineering tasks, so the results may not translate cleanly to long-running, open-ended research.
 
 <aside class="decision">
-<p class="decision-label">Decision</p>
+<p class="decision-label">Question</p>
 
 **Where do you think research capabilities are today?**
 
-The information that’s publicly available doesn’t paint a compelling picture of models being particularly good at autonomously performing research. I certainly believe that they’re a great multiplying factor when paired with a competent human researcher, but I don’t yet see strong evidence that they could perform high-quality research on their own.
+<p class="decision-label">Current view</p>
+
+I believe that models are already a significant multiplying factor when paired with a competent human researcher. I’m much less convinced that they can autonomously perform high-quality research without substantial human direction.
+
+<p class="decision-label">What would change my mind</p>
+
+I’d update strongly if labs showed that a much larger share of agent usage was happening in the harder parts of research, particularly deciding what to work on and designing the research approach rather than mainly executing predefined tasks. I’d update even more if those results were independently validated rather than relying only on lab self-reporting.
 
 </aside>
 
@@ -118,11 +130,17 @@ Compute is also likely to keep growing quickly over the next few years. [AI 2027
 AI could partly improve compute constraints by improving chip design, hardware efficiency and the operation of electricity systems. There are already [examples](https://deepmind.google/blog/how-alphachip-transformed-computer-chip-design) of this [happening](https://deepmind.google/blog/alphaevolve-impact), but it is much less clear how much AI can speed up the physical manufacturing and infrastructure buildout needed to add new compute.
 
 <aside class="decision">
-<p class="decision-label">Decision</p>
+<p class="decision-label">Question</p>
 
 **Will compute be a bottleneck over the next decade?**
 
-I expect that compute will continue to grow in the range of 3-4x over the next few years, unless there is an external shock to that trajectory (like a data center ban in the US). I think that some efficiency gains thanks to AI research are possible, but these are unlikely to be significant until we have much more capable researchers.
+<p class="decision-label">Current view</p>
+
+This is the part of the picture where I have the weakest intuition, so I’m mostly relying on existing estimates. I’ll use Epoch’s estimate of around 3.4× annual compute growth for frontier labs as a reasonable baseline over the next few years. I expect AI-driven efficiency gains to matter eventually, but probably not dramatically until we have much more capable AI researchers.
+
+<p class="decision-label">What would change my mind</p>
+
+I’d update quickly if there were major restrictions on data-center buildout in the US. In the other direction, I’d update if labs were consistently able to bring new power and data-center capacity online much faster than current estimates assume.
 
 </aside>
 
@@ -146,11 +164,17 @@ Models may still be able to learn some of this indirectly. They can combine idea
 We could also try to teach these harder-to-capture parts of research through reinforcement learning. Models can be put in environments where they propose ideas, run experiments, and learn from the results. The difficulty is that this works best when we can define what success looks like, and good research is often hard to score.
 
 <aside class="decision">
-<p class="decision-label">Decision</p>
+<p class="decision-label">Question</p>
 
-**Can we continue to provide valuable training signals for training?**
+**Can we continue to provide useful training signal?**
 
-It seems likely to me that we’ll run into data bottlenecks, even if we can pick some low-hanging fruit by using pretraining data more efficiently or generating synthetic data. I’m particularly skeptical that synthetic data will produce much genuinely new information in research, where a lot of the useful judgement isn’t well written down. I’ve read Obama’s biography, but I certainly don’t know how to be president. It seems more plausible that reinforcement learning could help models make better use of the knowledge they already have and improve at parts of the research process. But creating good training environments for open-ended research seems expensive and difficult, and I think that could become a meaningful bottleneck. I certainly expect labs to pour resources into this problem, but suspect progress will still be limited by the human speed at which we can build and verify useful training environments.
+<p class="decision-label">Current view</p>
+
+I think we probably can, but that it will get increasingly difficult. Reinforcement learning seems more promising than synthetic data for improving research capabilities, but creating and verifying good environments for open-ended research still seems expensive and human-intensive.
+
+<p class="decision-label">What would change my mind</p>
+
+I’d change my view significantly if we were able to create high-quality RL environments for difficult-to-measure problems, and actually did the expensive work of properly verifying that new capabilities emerged from them. I’d update quite strongly if research showed that we could continue getting substantial gains from the data we already have through better reuse or training optimizations.
 
 </aside>
 
@@ -158,18 +182,85 @@ It seems likely to me that we’ll run into data bottlenecks, even if we can pic
 
 (A warning for ML researchers: what follows is intentionally simplified)
 
-Improvements to the algorithms we use to train models can [decrease the amount of compute](https://epoch.ai/gradient-updates/the-least-understood-driver-of-ai-progress) needed to reach the same level of performance, which means we can train more capable models on the same hardware. It’s [difficult to decouple](https://epoch.ai/publications/algorithmic-progress-in-language-models) these gains from improvements in data and increased scale because all of these tend to change together. Available [estimates](https://epoch.ai/gradient-updates/the-least-understood-driver-of-ai-progress#appendix-estimates-of-software-progress) have a very large margin for error, but suggest that improvements to AI software may be equivalent to several-fold more effective compute each year.
+Improvements to the efficiency of algorithms we use to train models can [decrease the amount of compute](https://epoch.ai/gradient-updates/the-least-understood-driver-of-ai-progress) needed to reach the same level of performance, which means we can train more capable models on the same hardware. It’s [difficult to decouple](https://epoch.ai/publications/algorithmic-progress-in-language-models) these gains from improvements in data and increased scale because all of these tend to change together. Available [estimates](https://epoch.ai/gradient-updates/the-least-understood-driver-of-ai-progress#appendix-estimates-of-software-progress) have a very large margin for error, but suggest that improvements to AI software may be equivalent to several-fold more effective compute each year.
 
-Right now, frontier models are built using [transformers](https://youtu.be/wjZofJX0v4M?si=eObFrVGKDDeeRize). They were a [significant step forward in performance](https://epoch.ai/publications/algorithmic-progress-in-language-models?utm_source=chatgpt.com), and were developed by trying different ideas and seeing what worked, guided by theory and intuition. There’s no reason to assume that transformers are the best architecture we could ever find; they’re just the best option we know of.
+Right now, frontier models are built using [transformers](https://youtu.be/wjZofJX0v4M?si=eObFrVGKDDeeRize). They were a [significant step forward in performance](https://epoch.ai/publications/algorithmic-progress-in-language-models), and were developed by trying different ideas and seeing what worked, guided by theory and intuition. There’s no reason to assume that transformers are the best architecture we could ever find; they’re just the best option we know of.
 
 AI-driven research could run experiments, measure results and improve algorithms in the same way people have. Models are likely a long way from independently discovering a completely new architecture, but larger improvements seem plausible if they’re given enough time and compute to experiment.
 
 <aside class="decision">
-<p class="decision-label">Decision</p>
+<p class="decision-label">Question</p>
 
-**How should we reason about algorithmic progress?**
+**How should we reason about algorithmic and software progress?**
 
-It seems reasonable to work with a conservative baseline of around 2–3× software efficiency gains per year, while allowing for a smaller chance of a much larger breakthrough. The margin for error here is very high, so this is a guess that’s worth updating often.
+<p class="decision-label">Current view</p>
+
+Improvements across the software and training stack have historically been [estimated](https://epoch.ai/publications/algorithmic-progress-in-language-models) to produce gains equivalent to around 2–3× more compute per year. That seems like a reasonable rough baseline given how uncertain the numbers are. There’s also the possibility that we find a completely new paradigm beyond transformers, but I currently think that’s relatively unlikely.
+
+<p class="decision-label">What would change my mind</p>
+
+I’d change my view if new research did a better job of separating algorithmic improvements from gains due to increased compute, particularly if frontier labs acknowledged that the methods were genuinely new and useful to them. I’d also update if serious work on a different model paradigm started producing promising early results, making a larger architectural breakthrough seem more plausible.
+
+</aside>
+
+## The Feedback Loop
+
+What makes RSI different from ordinary research is the potential for a feedback loop. A human researcher who makes a breakthrough moves their field forward, but they're still the same researcher afterwards. An AI that makes a breakthrough can produce a better model, and that better model may be able to make the next breakthrough faster.
+
+If each model speeds up the next, then you get a takeoff. If something slows this down, then you get something closer to today’s progress. Parts of this loop can be measured, but the whole thing can't yet. So this section leans more on educated guesses from researchers, and on what the labs say about themselves, than the rest of the post.
+
+### Research Boost
+
+The loop only gets going if better models actually help with the work of building their successors. Each new model can make the people and agents working on the next one more productive.
+
+The labs report that this boost is already large, although all note that these measurements are difficult to isolate. Anthropic says [more than 80% of its merged code](https://www.anthropic.com/institute/recursive-self-improvement) is now written by Claude, and its researchers report about 4× more output, up from [+50% a year earlier](https://www.anthropic.com/research/how-ai-is-transforming-work-at-anthropic). OpenAI reports [3.1 agent-workdays for every human workday](https://openai.com/index/research-acceleration-view-inside-openai/).
+
+More code and more experiments aren’t the same as faster progress, but even a modest boost compounds if every new model makes the next round of research a little faster.
+
+### Research Autonomy
+
+How much of the research AI can take on without people matters as much as how fast it works. [Amdahl’s law](https://en.wikipedia.org/wiki/Amdahl%27s_law) says a process can only go as fast as its slowest part. If AI does 95% of the research but humans still do the other 5%, research can only go about 20× faster, however good the AI gets.
+
+In OpenAI’s [breakdown](https://openai.com/index/research-acceleration-view-inside-openai/#the-work-researchers-use-agents-for-is-changing), agents mostly build and run experiments, while humans still choose priorities and decide whether to scale or ship. METR’s [timelines model](https://metr.org/notes/2026-02-10-simpler-ai-timelines-model/) puts automation at 25–50% of AI research tasks in early 2026, with a median of more than 99% by late 2032. The last few percent matter a lot: going from 90% to 99% moves the ceiling from 10× to 100×.
+
+I think that this will come down to research taste and judgement. If AI can make good decisions about what to research, the loop can run much faster. If humans are still needed for those decisions, it stays tied to human speed.
+
+### Deployment Lag
+
+A good idea doesn’t help the loop until it ends up in a model that can use it for the next round of research, and every turn of the loop waits on that journey.
+
+[OpenAI](https://openai.com/index/research-acceleration-view-inside-openai/) describes this development cycle as including experiment design, evaluation, infrastructure work and debugging before changes make it into training. [Epoch](https://epoch.ai/epoch-after-hours/ai-in-2030) estimates frontier training runs already take on the order of several months. RSI could compress much of the work around the training run by automating experiments, coding, evaluation and debugging, but some latency remains because experiments and training still have to physically run.
+
+Deployment lag therefore acts less like a ceiling on takeoff than a brake on its timing. It doesn’t necessarily change how far capabilities eventually rise; it spreads those gains over more calendar time, turning what might otherwise look like a near-vertical jump into a sequence of fast steps over time.
+
+### Hardware Speedup
+
+AI could also accelerate the loop by improving the hardware that makes training and research possible. That could mean designing better chips, getting more useful compute out of existing hardware, or making data centers more efficient to build and run so that the compute bottleneck is eased.
+
+AI is [already](https://deepmind.google/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/) being used to improve chip design, but turning those gains into substantially more compute still requires physical infrastructure. [Epoch](https://epoch.ai/gradient-updates/compute-scaling-will-slow-down-due-to-increasing-lead-times) estimates roughly 1–2 years to build a data center, 2–3 years for very large facilities or power plants, and 4–5 years for a new cutting-edge chip fab.
+
+RSI could shorten design and planning, and sufficiently capable robotics could eventually speed up construction and manufacturing too, but for now hardware looks like a much slower feedback loop than software.
+
+### Difficulty of Innovation
+
+Not everything pushes the loop faster. As the obvious ideas get used up, each improvement may take more research than the last.
+
+We don’t have good evidence for how quickly this effect sets in for AI research. Moore’s law is probably the closest analogue we have: sustaining progress in chip performance has required far [more researchers over time](https://pubs.aeaweb.org/doi/10.1257/aer.20180338). But AI research may behave very differently, so this is at best a rough comparison rather than something we should assume carries over.
+
+This is one of the [main things](https://www.forethought.org/research/will-ai-r-and-d-automation-cause-a-software-intelligence-explosion) that determines whether RSI runs away or simply makes progress much faster. If better AI researchers increase research productivity faster than new ideas become harder to find, the [loop accelerates](https://www.nber.org/papers/w35155); if not, automation can still compress years of progress without producing an explosion.
+
+<aside class="decision">
+<p class="decision-label">Question</p>
+
+**Which effect do you think will dominate the feedback loop?**
+
+<p class="decision-label">Current view</p>
+
+I think incomplete autonomy and diminishing returns will dominate. Humans still seem important for judging research quality and deciding what to pursue. I have a weakly held impression, based mostly on anecdotal evidence, that the gains we’re seeing so far are coming more from low-hanging fruit than from genuinely new innovation.
+
+<p class="decision-label">What would change my mind</p>
+
+I’d shift toward a much faster loop if AI drove dramatic improvements in hardware or robotics, or if we moved past the obvious low-hanging fruit and experts still reported genuinely important innovations arriving quickly.
 
 </aside>
 
@@ -241,8 +332,8 @@ The chart below gives a sample of those views, ranging from relatively skeptical
 
 ## Conclusion
 
-Predictions on AI timelines tend to [age like milk](https://xkcd.com/386/), so I expect to update these views as my understanding grows and new information comes in. [My current intuition](https://carlakc.me/writing/recursive-self-improvement/?boost=high&cap=99&hardware=medium&data=low#back-of-envelope) is that AI will become extremely useful for performing and speeding up research, but that data, compute and the messy realities of doing good research will create bottlenecks along the way. I’m not expecting an exponential takeoff. But I am expecting progress to be very, very fast.
+Predictions on AI timelines tend to [age like milk](https://xkcd.com/386/), so I expect to update these views as my understanding grows and new information comes in. [My current intuition](https://carlakc.me/writing/recursive-self-improvement/?cap=95&hardware=medium&data=low#back-of-envelope) is that AI will become extremely useful for performing and speeding up research, but that data, compute and the messy realities of doing good research will create bottlenecks along the way. I’m not expecting an exponential takeoff. But I am expecting progress to be very, very fast.
 
-Which means there is work to be done. We need better ways to measure the difficult-to-measure capabilities of models, particularly their ability to autonomously perform and accelerate AI research. We need labs to publish independently verifiable evidence about progress toward RSI. And we need to ensure that models emerging from this fast-moving cycle actually do what we want them to do, rather than literally or figuratively hacking their way to the easiest possible solution.
+Which means there is work to be done. Throughout this post, the evidence that matters most has been the hardest to get: evaluations measure what's easy to measure, the best numbers on research uplift come from the labs' own reports, and nobody has measured the feedback loop as a whole. We need better ways to measure the messy, open-ended capabilities that research depends on, and we need labs to publish evidence about their progress that others can check. Most of all, the loop gets faster precisely as humans step out of it, which is also when it's hardest to notice if models are taking shortcuts rather than doing what we actually want.
 
-[^agi]: A system that can perform at or above a competent human level across most cognitive tasks.
+*Many thanks to [Alexander Reinthal](https://www.reinthal.me/about/) for helping me out with helpful resources, questions and review. Also thanks to [Elle Mouton](https://www.ellemouton.com/) and [Leila Stein](https://www.linkedin.com/in/leila-stein-074a0670/) for their input.*
